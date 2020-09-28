@@ -12,7 +12,7 @@
         <ByteLimit>50</ByteLimit>
     </Stack>
     <DebugChecksum>
-        <Checksum>977281651</Checksum>
+        <Checksum>2604163270</Checksum>
     </DebugChecksum>
     <CodeCoverage>
         <Enabled>_ 0</Enabled>
@@ -156,9 +156,16 @@
     <Breakpoints2>
         <Bp0>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\config\sdk_config.h}.7728.1" 0 0 1 "" 0 "" 0</Bp0>
         <Bp1>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\external\freertos\portable\CMSIS\nrf52\port_cmsis.c}.159.5" 0 0 1 "" 0 "" 0</Bp1>
-        <Bp2>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\main.c}.705.1" 0 0 1 "" 0 "" 0</Bp2>
-        <Bp3>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\app\twi.c}.168.1" 0 0 1 "" 0 "" 0</Bp3>
-        <Count>4</Count>
+        <Bp2>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\app\twi.c}.168.1" 0 0 1 "" 0 "" 0</Bp2>
+        <Bp3>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\mpu6050\eMPL\inv_mpu.c}.2355.9" 0 0 1 "" 0 "" 0</Bp3>
+        <Bp4>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\mpu6050\eMPL\inv_mpu.c}.2352.9" 0 0 1 "" 0 "" 0</Bp4>
+        <Bp5>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\mpu6050\eMPL\inv_mpu.c}.2361.13" 0 0 1 "" 0 "" 0</Bp5>
+        <Bp6>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\mpu6050\eMPL\inv_mpu.c}.2364.12" 0 0 1 "" 0 "" 0</Bp6>
+        <Bp7>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\components\libraries\fifo\app_fifo.c}.44.1" 0 0 1 "" 0 "" 0</Bp7>
+        <Bp8>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\main.c}.1.1" 0 0 1 "" 0 "" 0</Bp8>
+        <Bp9>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\main.c}.663.3" 0 0 1 "" 0 "" 0</Bp9>
+        <Bp10>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\main.c}.664.3" 0 0 1 "" 0 "" 0</Bp10>
+        <Count>11</Count>
     </Breakpoints2>
     <Aliases>
         <Count>0</Count>

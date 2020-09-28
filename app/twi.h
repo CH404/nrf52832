@@ -72,11 +72,13 @@ MAX30102
 
 TWI_EXT ret_code_t TwiDriverInit(deviceName name);
 TWI_EXT ret_code_t TwiDriverSend( uint8_t address, uint8_t * p_data, size_t length);
-TWI_EXT void test(void);
-TWI_EXT uint8_t I2c_Tx(uint8_t address, uint8_t const * pdata,uint16_t length,bool noStop,uint8_t repetitionCnt);
+//TWI_EXT void test(void);
+TWI_EXT uint8_t I2c_Tx(uint8_t address, uint8_t const * pdata,uint16_t length,bool noStop,bool startAndAdd,uint8_t repetitionCnt);
 TWI_EXT uint8_t I2c_Rx(uint8_t address, uint8_t *const  pdata,uint16_t length,uint8_t repetitionCnt);
 
 
+TWI_EXT uint8_t I2c_Rx_OneByte(uint8_t address, uint8_t reg);
+TWI_EXT uint8_t I2c_Tx_OneByte(uint8_t address, uint8_t reg,uint8_t data);
 
 TWI_EXT void I2cSimulationInit(void);
 TWI_EXT bool I2cSimulationSendByte(uint8_t data);

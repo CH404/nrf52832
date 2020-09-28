@@ -96,7 +96,7 @@ ret_code_t TwiDriverSend( uint8_t address, uint8_t * p_data, size_t length)
 	3、W 发送8位数据/ 放弃SCL, R 接收8位数据
 
 */
-
+#if 0
 void test(void)
 {
 	ret_code_t err = 0;
@@ -129,6 +129,67 @@ NRF_LOG_INFO("0x%x",rx_data_buff[2]);
 
 								
 }
+#endif
+
+/***************************************
+* 函数名:uint8_t I2c_Tx_OneByte(uint8_t address, uint8_t reg,uint8_t data)
+* 参数: address 器件地址 
+*				reg 寄存器地址
+*				data 数据
+* 功能:模拟IIC 发送单字节数据
+* 返回:成功 SUCCESS_I2C
+****************************************/
+uint8_t I2c_Tx_OneByte(uint8_t address, uint8_t reg,uint8_t data)
+{
+	uint16_t i = 0;
+	bool retAck = false;
+	address = (address<<1|0);
+	I2cSimulationStart();
+	retAck = 	I2cSimulationSendByte(address);
+		if(!retAck)
+			return ERROR_ADDRESS_NO_ACK;
+	
+		retAck = I2cSimulationSendByte(reg);
+		if(!retAck)
+			return ERROR_TX_DATA_NO_ACK;
+
+			retAck = I2cSimulationSendByte(data);
+		if(!retAck)
+			return ERROR_TX_DATA_NO_ACK;
+		
+   I2cSimulationStop();
+	return SUCCESS_I2C;
+}
+/***************************************
+* 函数名:uint8_t I2c_Rx_OneByte(uint8_t address, uint8_t reg)
+* 参数: address 器件地址 
+*				reg 寄存器地址
+*				data 数据
+* 功能:模拟IIC 接收单字节数据
+* 返回:data 数据
+****************************************/
+uint8_t I2c_Rx_OneByte(uint8_t address, uint8_t reg)
+{
+	uint8_t data;
+        bool retAck;
+	I2cSimulationStart();
+	retAck = I2cSimulationSendByte(address<<1|1);
+		if(!retAck)
+			return ERROR_ADDRESS_NO_ACK;
+	
+		retAck = I2cSimulationSendByte(reg);
+		if(!retAck)
+			return ERROR_TX_DATA_NO_ACK;
+
+			retAck = I2cSimulationSendByte(address<<1|0);
+		if(!retAck)
+			return ERROR_TX_DATA_NO_ACK;
+		
+		data = I2cSimulationReadByte(0);	//主机接收完数据要发送应答非					
+ 		I2cSimulationStop();
+	return data;
+}
+
 
 /***************************************
 * 函数名:uint8_t I2c_Tx(uint8_t address, uint8_t const * pdata,uint16_t length,bool noStop,uint8_t repetitionCnt)
@@ -140,10 +201,12 @@ NRF_LOG_INFO("0x%x",rx_data_buff[2]);
 * 功能:模拟IIC 发送数据
 * 返回:成功 SUCCESS_I2C
 ****************************************/
-uint8_t I2c_Tx(uint8_t address, uint8_t const * pdata,uint16_t length,bool noStop,uint8_t repetitionCnt)
+uint8_t I2c_Tx(uint8_t address, uint8_t const * pdata,uint16_t length,bool noStop,bool startAndAdd,uint8_t repetitionCnt)
 {
 	uint16_t i = 0;
 	bool retAck = false;
+        if(startAndAdd)
+        {
 	address = (address<<1|0);
 I2C_TX_flags:	I2cSimulationStart();
 	retAck = 	I2cSimulationSendByte(address);
@@ -155,7 +218,7 @@ I2C_TX_flags:	I2cSimulationStart();
 
 		if(!retAck)
 			return ERROR_ADDRESS_NO_ACK;
-	
+	}
 	for(i=0;i<length;i++)
 		{
 		retAck = I2cSimulationSendByte(pdata[i]);

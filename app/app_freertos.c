@@ -4,7 +4,7 @@
 #define APP_FREE_GLOBAL
 #include "app_freertos.h"
 #include "global.h"
-
+#include "inv_mpu.h"
 
 #define DATE_TIMER_TICKS 1000
 #define DATE_TIMER_WAIT 2	//消息队列已满下，等待多少个tick
@@ -47,32 +47,49 @@ void Start_Task(void* pvParameters)
 	uint32_t freemem;
 		taskENTER_CRITICAL();
 
-		RTCUpdateSem = xSemaphoreCreateCounting(RTCUpdateSemMaxCount,RTCUpdateSemInitCount);
+/*		RTCUpdateSem = xSemaphoreCreateCounting(RTCUpdateSemMaxCount,RTCUpdateSemInitCount);
                 if(RTCUpdateSem == NULL)
 									while(1);
 		wdtFeedEventHandle = xEventGroupCreate();
 								if(wdtFeedEventHandle == NULL)
-									while(1);
-
-		ret = xTaskCreate((TaskFunction_t)RTCUpdateTaskHandler,
-														(const char *)"rtc",
-														(uint16_t)RTC_UPDATE_TASK_SIZE,
+									while(1);*/
+ 
+		ret = xTaskCreate((TaskFunction_t)MPU_task,
+														(const char *)"mpu",
+														(uint16_t)MPU6050_DATA_TASK_SIZE,
 														(void*)NULL,
-														(UBaseType_t)RTC_UPDATE_TASK_PRIO,
-														&RTCUpdateTaskHandle);
+														(UBaseType_t)MPU6050_DATA_TASK_PRIO,									
+														&MPU_TASK);
 		if(ret != pdPASS )
 		{
 		freemem =	xPortGetFreeHeapSize();
 		while(1);
 		}
 														
-	ret =	xTaskCreate(WdtFeedTask,"wdt",WDT_TASK_SIZE,NULL,WDT_TASK_PRIO,&wdtFeedTaskHanle);
+/*	ret =	xTaskCreate(WdtFeedTask,"wdt",WDT_TASK_SIZE,NULL,WDT_TASK_PRIO,&wdtFeedTaskHanle);
         
 		if(ret != pdPASS )
 		{
 			freemem =	xPortGetFreeHeapSize();
 			while(1);
 		}
+
+
+		ret = xTaskCreate((TaskFunction_t)RTCUpdateTaskHandler,
+															(const char *)"rtc",
+															(uint16_t)RTC_UPDATE_TASK_SIZE,
+															(void*)NULL,
+															(UBaseType_t)RTC_UPDATE_TASK_PRIO,
+															&RTCUpdateTaskHandle);
+			if(ret != pdPASS )
+			{
+			freemem = xPortGetFreeHeapSize();
+			while(1);
+			}
+
+
+*/
+		
 		freemem =	xPortGetFreeHeapSize();
                 NRF_LOG_INFO("freemem %d",freemem);
 		vTaskDelete(NULL);

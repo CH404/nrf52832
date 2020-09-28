@@ -121,6 +121,10 @@ D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\..\..\modules\nrfx\soc
 -I
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\..\..\mpu6050\eMPL
 -I
+D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\..\..\mpu6050
+-I
+D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\..\..\components\libraries\fifo
+-I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\inc
 -I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\inc\c
@@ -240,6 +244,10 @@ D:\nRF5_SDK_15.2.0_9412b96\sdk17\components\softdevice\s132\headers\nrf52
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\modules\nrfx\soc
 -I
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\mpu6050\eMPL
+-I
+D:\nRF5_SDK_15.2.0_9412b96\sdk17\mpu6050
+-I
+D:\nRF5_SDK_15.2.0_9412b96\sdk17\components\libraries\fifo
 -D__CHAR_BITS__=8
 -D__CHAR_MAX__=0xff
 -D__CHAR_MIN__=0

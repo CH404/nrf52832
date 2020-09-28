@@ -3,11 +3,15 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "timers.h"
+#include "mpu6050.h"
 #ifdef APP_FREE_GLOBAL
 #define APP_FREE_EXT
 #else
 #define APP_FREE_EXT extern 
 #endif
+
+#define MPU6050_DATA_TASK_SIZE 256
+#define MPU6050_DATA_TASK_PRIO 4
 
 #define RTCUpdateSemMaxCount 1
 #define RTCUpdateSemInitCount 0

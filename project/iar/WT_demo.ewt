@@ -2399,6 +2399,9 @@
             <name>$PROJ_DIR$\..\main.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\mpu6050\mpu6050.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\app\rtc.c</name>
         </file>
         <file>
@@ -2537,10 +2540,22 @@
             <name>$PROJ_DIR$\..\..\integration\nrfx\legacy\nrf_drv_clock.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\integration\nrfx\legacy\nrf_drv_uart.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\modules\nrfx\drivers\src\nrfx_clock.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\modules\nrfx\drivers\src\nrfx_rtc.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\modules\nrfx\drivers\src\nrfx_twi.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\modules\nrfx\drivers\src\nrfx_uart.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\modules\nrfx\drivers\src\nrfx_uarte.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\modules\nrfx\drivers\src\nrfx_wdt.c</name>
@@ -2556,6 +2571,12 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\components\libraries\util\app_error_weak.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\components\libraries\fifo\app_fifo.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\components\libraries\uart\app_uart_fifo.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\components\libraries\util\app_util_platform.c</name>
@@ -2595,9 +2616,6 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\modules\nrfx\drivers\src\prs\nrfx_prs.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\modules\nrfx\drivers\src\nrfx_twi.c</name>
         </file>
     </group>
     <group>

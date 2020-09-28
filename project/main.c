@@ -1,10 +1,14 @@
 
 #define MAIN_GLOBAL
 #include "global.h"
-//#include "nrf_delay.h"
+#include "nrf_delay.h"
 #include "app_freertos.h"
 //#include "timers.h"
 #include "twi.h"
+#include "mpu6050.h"
+#include "inv_mpu.h"
+#include "inv_mpu_dmp_motion_driver.h" 
+
 APP_TIMER_DEF(led_timer);	
 NRF_BLE_GATT_DEF(m_gatt);//定义gatt模块实例
 
@@ -673,6 +677,7 @@ int main(void)
 {
 	ret_code_t err_code;
 	bool ret;
+        uint8_t a = 0x67;
 	main_log_init();
 	main_lfclk_config();
 //	power_management_init();
@@ -685,12 +690,23 @@ int main(void)
 	
 	conn_params_init();
 	peer_manager_init();
-  CommonWatchDogInit();
+//  CommonWatchDogInit();
   //   TwiDriverInit(MPU6050);
+// I2cSimulationInit();
+// test();
+// MPU_Read_Length();
+	uart_init();
 
- I2cSimulationInit();
- test();
+	while( a = mpu_dmp_init())
+		{
+                  NRF_LOG_INFO("mpu_dmp_init error:%d",a);
+		}
 
+NRF_LOG_INFO("mpu_dmp_init success");
+/*while(1)
+{
+	while(app_uart_put(a) != NRF_SUCCESS);
+}*/
    task_init();
    nrf_sdh_freertos_init(NULL,NULL);
 

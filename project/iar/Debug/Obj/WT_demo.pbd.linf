@@ -3,8 +3,10 @@ D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\advertising.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\app_error.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\app_error_handler_iar.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\app_error_weak.pbi
+D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\app_fifo.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\app_freertos.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\app_timer_freertos.pbi
+D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\app_uart_fifo.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\app_util_platform.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\auth_status_tracker.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\ble_advdata.pbi
@@ -26,6 +28,7 @@ D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\inv_mpu.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\inv_mpu_dmp_motion_driver.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\list.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\main.pbi
+D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\mpu6050.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrf_atfifo.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrf_atflags.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrf_atomic.pbi
@@ -33,6 +36,7 @@ D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrf_balloc.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrf_ble_gatt.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrf_ble_qwr.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrf_drv_clock.pbi
+D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrf_drv_uart.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrf_fprintf.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrf_fprintf_format.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrf_fstorage.pbi
@@ -54,6 +58,8 @@ D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrfx_clock.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrfx_prs.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrfx_rtc.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrfx_twi.pbi
+D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrfx_uart.pbi
+D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrfx_uarte.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrfx_wdt.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\peer_data_storage.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\peer_database.pbi
