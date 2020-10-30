@@ -7,26 +7,7 @@ uint16_t m_conn_handle= BLE_CONN_HANDLE_INVALID;
 
 
 //void WdtFeedTask (void *paramenters);
-TaskHandle_t wdtFeedTaskHanle;
-EventGroupHandle_t wdtFeedEventHandle;
 
-/**************************************************
-*作用:freertos task feed watchdog
-*参数:无
-*返回值:无
-***************************************************/
-void WdtFeedTask (void *paramenters)
-{
-	EventBits_t wdtFeedEvt = 0;
-	while(1)
-		{
-			//xEventGroupGetBits(wdtFeedEventHandle);
-			wdtFeedEvt = xEventGroupWaitBits(wdtFeedEventHandle,
-			WDT_FEED_EVT_WAIT_BIT,pdTRUE,pdTRUE,portMAX_DELAY);
-			if(wdtFeedEvt == WDT_FEED_EVT_WAIT_BIT)
-					nrfx_wdt_feed();		
-		}
-}
 
 
 

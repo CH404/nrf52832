@@ -17,15 +17,22 @@
 #define APP_ADV_INTERVAL					300	//The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms)
 #define DEVICE_NAME					    	"RED_MI"
 
+typedef enum{
+CLOSE = 0,
+OPEN
+}advertisingButtonState;
 
-ADVERTISING_EXT void advertising_init(void);
-ADVERTISING_EXT void advertising_start(void);
 static void on_adv_evt(ble_adv_evt_t ble_adv_evt);
-ADVERTISING_EXT void advertising1_init(void);
-ADVERTISING_EXT void advertising_start1(void);
-ADVERTISING_EXT void advertising_all_params_init(void);
 
-ADVERTISING_EXT void advertising_free_start(void);
-ADVERTISING_EXT void advertising_free_stop(void);
+ADVERTISING_EXT void advertising_code_init(void);		
+ADVERTISING_EXT void advertising_init(void);
+ADVERTISING_EXT void advertising_all_params_init(void); //都是广播参数初始化
+
+ADVERTISING_EXT void advertising_start(void);
+ADVERTISING_EXT void advertising_stop(void);
+ADVERTISING_EXT void advertising_button(void * p_context);
+
+ADVERTISING_EXT void advertising_start1(void);	//与advertising_start一样，只是直接调用协议栈API
+
 #endif
 

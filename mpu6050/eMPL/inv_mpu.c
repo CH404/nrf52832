@@ -2975,6 +2975,7 @@ uint8_t mpu_dmp_init(void)
 		if(res)return 6; 
 		res=dmp_set_fifo_rate(DEFAULT_MPU_HZ);	//设置DMP输出速率(最大不超过200Hz)
 		if(res)return 7;   
+             //   MPU_INT_Init();
 		res=run_self_test();		//自检
 		if(res)return 8;    
 		res=mpu_set_dmp_state(1);	//使能DMP

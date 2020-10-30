@@ -2,6 +2,15 @@
 #define __GLOBAL_H
 
 #define MY_QUEUE_ENABLE 0
+#define USE_FREERTOS 1
+#define OPEN_ADVERTISING 0
+#define ADD_SERVICE_TO_ADVERTISING 0
+#define USE_ADVERTISING_CODE_INIT 0
+#define USE_TASK 1
+#define USE_RTC_DATE_TASK 0
+#define USE_MPU6050_TASK 0
+#define USE_WATCH_DOG_TASK 0
+
 
 #include "nrf_strerror.h"
 
@@ -37,15 +46,17 @@
 #include "security_manager.h"
 
 //#include "my_queue.h"
-
+#if USE_FREERTOS
 #include "FreeRTOS.h"
 #include "task.h"
 #include "nrf_sdh_freertos.h"
+#endif
 
 #include "ble_bas.h"
 #include "common.h"
 #include "ble_date.h"
 #include "rtc.h"
+#include "nrf_delay.h"
 	//APP_ERROR_CHECK(error_code); 
 #endif
 

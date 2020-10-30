@@ -1,9 +1,8 @@
 #define RTC_GLOBAL
 #include "rtc.h"
 #include "global.h"
-#include "ble_srv_common.h"
-#include "ble_conn_state.h"
-#include "common.h"
+//#include "ble_srv_common.h"
+//#include "ble_conn_state.h"
 #include "nrf_delay.h"
 
 uint8_t month_table[12]={31,29,31,30,31,30,31,31,30,31,30,31};
@@ -18,7 +17,7 @@ real_time_t time_base = {
 };
 
 
-real_time_t current_time;
+
 static uint32_t real_time = 0;
 const nrfx_rtc_t rtc2 = NRFX_RTC_INSTANCE(2);
 /************************************************
@@ -252,10 +251,7 @@ void update_date(void)
 参数:
 返回值:
 **************************************************/
-	SemaphoreHandle_t RTCUpdateSem;
-	TaskHandle_t RTCUpdateTaskHandle;
-
-	void RTCUpdateTaskHandler(void *pvParamenters)
+/*	void RTCUpdateTaskHandler(void *pvParamenters)
 {
  
 	uint8_t buff[7] = {0};
@@ -266,10 +262,10 @@ void update_date(void)
 			data_convert(current_time,buff);
                      //   vTaskSuspend(NULL);
 			ble_date_notification(buff,7);
-                        xEventGroupSetBits(wdtFeedEventHandle,RTC_UPDATE_EVENT_BIT);
+      xEventGroupSetBits(wdtFeedEventHandle,RTC_UPDATE_EVENT_BIT);
 		}
 }
-
+*/
 /************************************************
 说明:创建freertos 计数型信号
 函数名:void ble_date_task_init(void)

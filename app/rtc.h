@@ -13,9 +13,9 @@
 #include "timers.h"
 #include <stdint.h>
 #include <stdbool.h>
-#include "ble.h"
-#include "ble_srv_common.h"
-#include "nrf_sdh_ble.h"
+//#include "ble.h"
+//#include "ble_srv_common.h"
+//#include "nrf_sdh_ble.h"
 
 typedef struct
 {
@@ -28,19 +28,20 @@ typedef struct
 	uint8_t week;
 }real_time_t;
 
+RTC_EXT real_time_t current_time;
 
 //#define RTCUpdateSemMaxCount 1
 //#define RTCUpdateSemInitCount 0
-RTC_EXT SemaphoreHandle_t RTCUpdateSem;
+//RTC_EXT SemaphoreHandle_t RTCUpdateSem;
 
 //#define RTC_UPDATE_TASK_SIZE 50
 //#define RTC_UPDATE_TASK_PRIO 2
-RTC_EXT TaskHandle_t RTCUpdateTaskHandle;
-RTC_EXT void RTCUpdateTaskHandler(void *pvParamenters);
+//RTC_EXT TaskHandle_t RTCUpdateTaskHandle;
+//RTC_EXT void RTCUpdateTaskHandler(void *pvParamenters);
 
-
+//
 RTC_EXT SemaphoreHandle_t RTCUpdateSem;
-RTC_EXT TaskHandle_t RTCUpdateTaskHandle;
+//RTC_EXT TaskHandle_t RTCUpdateTaskHandle;
 
 RTC_EXT void RTC2_init(nrfx_rtc_handler_t handler);
 RTC_EXT void data_convert(real_time_t data,uint8_t * buff);

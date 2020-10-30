@@ -5,7 +5,16 @@
 #include "ble_advertising.h"
 #include "ble_conn_state.h"
 BLE_ADVERTISING_DEF(m_advertising);
+
+#if ADD_SERVICE_TO_ADVERTISING
 //BLE_HRS_DEF(m_hrs); 
+//定义服务UUID数组,加入到广播中
+static ble_uuid_t m_adv_uuids[] = 
+{	//服务uuid													uuid类型
+ {BLE_UUID_HEART_RATE_SERVICE,BLE_UUID_TYPE_BLE},	//心跳uuid   BLE uuid
+ {BLE_UUID_DEVICE_INFORMATION_SERVICE,BLE_UUID_TYPE_BLE}//设备信息uuid BLE uuid
+};
+#endif
 
 /*****************************************************
 函数名：static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
@@ -51,74 +60,6 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
 	}
 }
 
-/*****************************************************
-函数名：void advertising_start(void)
-参数：无
-作用：开始广播
-******************************************************/
-void advertising_start(void)
-{
-    
-      NRF_LOG_INFO("advertising_start");
-      ret_code_t err_code = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);     
-      APP_ERROR_CHECK(err_code);
-		
-}
-/*****************************************************
-函数名：void advertising_start(void)
-参数：无
-作用：开始广播
-******************************************************/
-void advertising_free_start(void)
-{
-	//UNUSED_PARAMETER(p_context);
-   //   NRF_LOG_INFO("advertising_start");
-      ret_code_t err_code = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);     
-      APP_ERROR_CHECK(err_code);
-}
-
-/*****************************************************
-函数名：void advertising_free_stop(void)
-参数：无
-作用：断开链接，关闭广播
-******************************************************/
-void advertising_free_stop(void)
-{
-	//断开链接
-	//检测有多少接链接handle
-	uint32_t i;
-	ble_conn_state_conn_handle_list_t conn_handle;
-	//获取role(角色)中心设备的hanle
-	conn_handle = ble_conn_state_central_handles();
-	for(i=0;i<conn_handle.len;i++)
-		{
-			sd_ble_gap_disconnect(conn_handle.conn_handles[i],BLE_HCI_LOCAL_HOST_TERMINATED_CONNECTION);
-		}
-	sd_ble_gap_adv_stop(m_advertising.adv_handle);
-}
-
-/*****************************************************
-函数名：void advertising_free_hook(void)
-参数：无
-作用:作为SDH 的hook 函数，开始，关闭广播
-******************************************************/
-void advertising_button(void)
-{
-	bool button = false;
-
-	if(button)
-		advertising_free_stop();
-	else
-		advertising_free_start();
-}
-
-//定义服务UUID数组
-static ble_uuid_t m_adv_uuids[] = 
-{
- {BLE_UUID_HEART_RATE_SERVICE,BLE_UUID_TYPE_BLE},
-  {BLE_UUID_DEVICE_INFORMATION_SERVICE,BLE_UUID_TYPE_BLE}
-};
-
 
 /*****************************************************
 函数名：void advertising_init(void)
@@ -130,34 +71,32 @@ void advertising_init(void)
 	ret_code_t err_code = NRF_SUCCESS;
 	int8_t tx_power_level = 0;                              //定义广播功耗为0
 	ble_advertising_init_t init;
-	 memset(&init, 0, sizeof(init));
+	memset(&init, 0, sizeof(init));		//清0
 	//全名
 	init.advdata.name_type = BLE_ADVDATA_FULL_NAME;         //广播包含设备全名
 	init.advdata.include_appearance = true;                 //广播包含外貌，外貌在gap里设置
 	init.advdata.flags = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
         
 	init.advdata.p_tx_power_level = &tx_power_level;        //广播包含功耗
-        
-        
-        init.advdata.uuids_complete.uuid_cnt = (sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]));
-        init.advdata.uuids_complete.p_uuids = m_adv_uuids;
-	
-      //  NRF_LOG_INFO("%d",(sizeof(m_adv_uuids) ))
-     //     while(1);
-	init.config.ble_adv_fast_enabled = true;	//快速广播
+#if ADD_SERVICE_TO_ADVERTISING   
+	//包含完整的service 部分列表	
+  init.advdata.uuids_complete.uuid_cnt = (sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]));
+  init.advdata.uuids_complete.p_uuids = m_adv_uuids;
+#endif	
 
+	init.config.ble_adv_fast_enabled = true;	//快速广播
 	init.config.ble_adv_fast_interval = APP_ADV_INTERVAL;	//广播间隔
 	init.config.ble_adv_fast_timeout = APP_ADV_DURATION;	//广播持续时间,超时时间
 	
 	init.evt_handler = on_adv_evt;	//广播回调函数
 	
 	err_code = ble_advertising_init(&m_advertising,&init);//初始化广播
-	//NRF_LOG_INFO("%d",err_code);
 	G_CHECK_ERROR_CODE_INFO(err_code);
-
 	ble_advertising_conn_cfg_tag_set(&m_advertising,APP_BLE_CONN_CFG_TAG);
         
 }
+
+#if USE_ADVERTISING_CODE_INIT 
 
 static uint8_t m_adv_handle = BLE_GAP_ADV_SET_HANDLE_NOT_SET;                   /**< Advertising handle used to identify an advertising set. */
 static uint8_t m_enc_advdata[BLE_GAP_ADV_SET_DATA_SIZE_MAX];
@@ -183,7 +122,7 @@ static ble_gap_adv_data_t m_adv_data =
 参数：无
 作用：广播初始化，不包括启动广播，广播包含服务
 ******************************************************/
-void advertising1_init(void)
+void advertising_code_init(void)
 {
   //定义广播参数结构体
   ble_advdata_t advdata;
@@ -224,6 +163,8 @@ void advertising1_init(void)
   ble_advertising_conn_cfg_tag_set(&m_advertising,APP_BLE_CONN_CFG_TAG);
   
 }
+
+
 /*****************************************************
 函数名：void advertising_start1(void)
 参数：无
@@ -235,12 +176,15 @@ void advertising_start1(void)
     APP_ERROR_CHECK(err_code);
 }
 
+#endif
+
  static void ble_adv_error_handler (uint32_t nrf_error)
  {
    
    NRF_LOG_INFO("%d:%s:%d",__LINE__,__func__,nrf_error);
    APP_ERROR_CHECK(nrf_error);
  }
+ 
 /*****************************************************
 函数名：void advertising1_init(void)
 参数：无
@@ -264,13 +208,13 @@ void advertising_all_params_init(void)
   init.advdata.p_tk_value = NULL;    //用于NFC,BLE advertising set NULL
   init.advdata.p_sec_mgr_oob_flags = NULL;//用于NFC,BLE advertising set NULL
   init.advdata.le_role = NULL;//用于NFC,BLE advertising set NULL
-   
+   */
   //广播中带服务数据
-ble_advdata_service_data_t sever_data;
+/*	ble_advdata_service_data_t sever_data;
   memset(&sever_data,0,sizeof(sever_data));
   
   uint8_t data = 0x99;  //数据
-  sever_data.service_uuid = BLE_UUID_BATTERY_SERVICE;   //服务UUID
+  sever_data.service_uuid = BLE_UUID_BATTERY_SERVICE;   //服务UUID 
   sever_data.data.size = sizeof(data);  //数据大小
   sever_data.data.p_data = &data;        //数据
   
@@ -279,15 +223,15 @@ ble_advdata_service_data_t sever_data;
   init.advdata.p_slave_conn_int = NULL; //从机连接间隔范围
   init.advdata.p_manuf_specific_data = NULL;    //制造商自定义数据
   */
- 
- //add service 部分列表			
-// init.advdata.uuids_more_available.uuid_cnt = (sizeof(m_adv_uuids)/sizeof(m_adv_uuids[0]))-1; //包含UUID个数
-// init.advdata.uuids_more_available.p_uuids= m_adv_uuids;
+#if ADD_SERVICE_TO_ADVERTISING 
+// add service 部分列表			
+ init.advdata.uuids_more_available.uuid_cnt = (sizeof(m_adv_uuids)/sizeof(m_adv_uuids[0]))-1; //包含UUID个数
+ init.advdata.uuids_more_available.p_uuids= m_adv_uuids;
 
  //完整
-//  init.advdata.uuids_complete.p_uuids = m_adv_uuids;
+ // init.advdata.uuids_complete.p_uuids = m_adv_uuids;
  // init.advdata.uuids_complete.uuid_cnt = (sizeof(m_adv_uuids)/sizeof(m_adv_uuids[0]));
- 
+ #endif
  
  
   //error 回调函数
@@ -303,6 +247,8 @@ ble_advdata_service_data_t sever_data;
 /*	init.config.ble_adv_directed_enabled = true;
 	init.config.ble_adv_directed_interval = APP_ADV_INTERVAL;
     init.config.ble_adv_directed_timeout =  APP_ADV_DURATION;   */
+
+	//低速广播模式
   init.config.ble_adv_slow_enabled = true;
   init.config.ble_adv_slow_interval = APP_ADV_SLOW_INTERVAL;
   init.config.ble_adv_slow_timeout = APP_ADV_SLOW_DURATION;
@@ -311,6 +257,57 @@ ble_advdata_service_data_t sever_data;
   G_CHECK_ERROR_CODE_INFO(err_code);
 
   ble_advertising_conn_cfg_tag_set(&m_advertising,APP_BLE_CONN_CFG_TAG);
+}
+
+
+
+/*****************************************************
+函数名：void advertising_start(void)
+参数：无
+作用：开始广播
+******************************************************/
+void advertising_start(void)
+{
+		//	UNUSED_PARAMETER(p_context);
+   //   NRF_LOG_INFO("advertising_start");
+      ret_code_t err_code = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);     
+      APP_ERROR_CHECK(err_code);
+}
+
+/*****************************************************
+函数名：void advertising_free_stop(void)
+参数：无
+作用：断开链接，关闭广播
+******************************************************/
+void advertising_stop(void)
+{
+	//断开链接
+	//检测有多少接链接handle
+	uint32_t i;
+//	UNUSED_PARAMETER(p_context);
+	ble_conn_state_conn_handle_list_t conn_handle;
+	//获取role(角色)中心设备的hanle
+	conn_handle = ble_conn_state_central_handles();
+	for(i=0;i<conn_handle.len;i++)
+		{
+			sd_ble_gap_disconnect(conn_handle.conn_handles[i],BLE_HCI_LOCAL_HOST_TERMINATED_CONNECTION);
+		}
+	sd_ble_gap_adv_stop(m_advertising.adv_handle);
+}
+
+/*****************************************************
+函数名：void advertising_button(void * p_context)
+参数：无
+作用:作为SDH 的hook 函数或裸机函数，开始，关闭广播
+******************************************************/
+void advertising_button(void * p_context)
+{
+	uint8_t button = *((uint8_t*)p_context);
+
+	if(button)
+		advertising_start();
+	else
+		advertising_stop();
 }
 
 

@@ -125,6 +125,8 @@ D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\..\..\mpu6050
 -I
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\..\..\components\libraries\fifo
 -I
+D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\..\..\UIcode
+-I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\inc
 -I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\inc\c
@@ -248,6 +250,8 @@ D:\nRF5_SDK_15.2.0_9412b96\sdk17\mpu6050\eMPL
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\mpu6050
 -I
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\components\libraries\fifo
+-I
+D:\nRF5_SDK_15.2.0_9412b96\sdk17\UIcode
 -D__CHAR_BITS__=8
 -D__CHAR_MAX__=0xff
 -D__CHAR_MIN__=0
@@ -549,8 +553,9 @@ D:\nRF5_SDK_15.2.0_9412b96\sdk17\components\libraries\fifo
 -DSOFTDEVICE_PRESENT=1
 -DSWI_DISABLE0=1
 -DDEBUG=1
--D_DLIB_CONFIG_FILE_HEADER_NAME="C:\\Program Files (x86)\\IAR Systems\\Embedded Workbench 8.2\\arm\\inc\\c\\DLib_Config_Normal.h"
--D_DLIB_CONFIG_FILE_STRING="C:\\Program Files (x86)\\IAR Systems\\Embedded Workbench 8.2\\arm\\inc\\c\\DLib_Config_Normal.h"
+-DCONFIG_NFCT_PINS_AS_GPIOS=1
+-D_DLIB_CONFIG_FILE_HEADER_NAME="C:\\Program Files (x86)\\IAR Systems\\Embedded Workbench 8.2\\arm\\inc\\c\\DLib_Config_Full.h"
+-D_DLIB_CONFIG_FILE_STRING="C:\\Program Files (x86)\\IAR Systems\\Embedded Workbench 8.2\\arm\\inc\\c\\DLib_Config_Full.h"
 -D__VERSION__="IAR ANSI C/C++ Compiler V8.32.1.169/W32 for ARM"
 -D__ICCARM_OLD_DEFINED_VAARGS__=1
 -D__VA_STACK_ALIGN__=8

@@ -1,9 +1,8 @@
 #ifndef __MPU6050_H
 #define __MPU6050_H
 
-#include "FreeRTOS.h"
-#include "task.h"
 #include <stdint.h>
+
 #ifdef MPU6050_GLOBAL
 #define MPU6050_ETX
 #else
@@ -81,8 +80,18 @@
 #define MPU_FIFO_RW_REG			0X74	//FIFO读写寄存器
 #define MPU_DEVICE_ID_REG		0X75	//器件ID寄存器
 
+#define MPU_MOT_THR	0x1F	//加速度中断阈值寄存器
+#define MPU_MOT_DUR	0x20	//加速度中断时间寄存器
 
-MPU6050_ETX TaskHandle_t MPU_TASK;
+#define MPU_ZRMOT_THR 0x21	//静止
+#define MPU_ZRMOT_DUR 0x22 
+
+#define MPU_FF_THR 0x1D			//自由落体
+#define MPU_FF_DUR 0x1E
+
+
+
+//MPU6050_ETX float_t pitch[5];
 
 
 
@@ -93,8 +102,10 @@ uint8_t MPU_Set_Gyro_Fsr(uint8_t fsr);
 uint8_t MPU_Set_Accel_Fsr(uint8_t fsr);
 uint8_t MPU_Set_LPF(uint16_t lpf);
 uint8_t MPU_Set_Rate(uint16_t rate);
-void uart_init(void);
+MPU6050_ETX void uart_init(void);
+MPU6050_ETX void MPU_INT_Init(void);
 
+MPU6050_ETX void MPU_Read(void);
 
 
 short MPU_Get_Temperature(void);

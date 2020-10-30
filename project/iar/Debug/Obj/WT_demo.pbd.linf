@@ -15,6 +15,7 @@ D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\ble_conn_params.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\ble_conn_state.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\ble_date.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\ble_srv_common.pbi
+D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\bmp.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\common.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\croutine.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\event_groups.pbi
@@ -26,6 +27,8 @@ D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\heap_4.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\id_manager.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\inv_mpu.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\inv_mpu_dmp_motion_driver.pbi
+D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\it725x.pbi
+D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\lcd.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\list.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\main.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\mpu6050.pbi
@@ -36,6 +39,8 @@ D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrf_balloc.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrf_ble_gatt.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrf_ble_qwr.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrf_drv_clock.pbi
+D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrf_drv_spi.pbi
+D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrf_drv_twi.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrf_drv_uart.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrf_fprintf.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrf_fprintf_format.pbi
@@ -55,9 +60,13 @@ D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrf_sdh_soc.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrf_section_iter.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrf_strerror.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrfx_clock.pbi
+D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrfx_gpiote.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrfx_prs.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrfx_rtc.pbi
+D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrfx_spi.pbi
+D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrfx_spim.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrfx_twi.pbi
+D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrfx_twim.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrfx_uart.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrfx_uarte.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\nrfx_wdt.pbi
@@ -78,6 +87,8 @@ D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\SEGGER_RTT.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\SEGGER_RTT_printf.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\SEGGER_RTT_Syscalls_IAR.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\service.pbi
+D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\spi.pbi
+D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\st7789.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\stream_buffer.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\system_nrf52.pbi
 D:\nRF5_SDK_15.2.0_9412b96\sdk17\project\iar\Debug\Obj\tasks.pbi

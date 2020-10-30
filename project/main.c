@@ -8,7 +8,10 @@
 #include "mpu6050.h"
 #include "inv_mpu.h"
 #include "inv_mpu_dmp_motion_driver.h" 
-
+#include "spi.h"
+#include "st7789.h"
+#include "bmp.h"
+//#include "it725x.h"
 APP_TIMER_DEF(led_timer);	
 NRF_BLE_GATT_DEF(m_gatt);//定义gatt模块实例
 
@@ -18,9 +21,9 @@ NRF_BLE_GATT_DEF(m_gatt);//定义gatt模块实例
 static ble_opt_t static_option;
 ble_gap_sec_params_t sec_params;
 
-#if NRF_LOG_ENABLED
+#if NRF_LOG_ENABLED && USE_FREERTOS
 static TaskHandle_t m_logger_thread;
-#endif
+
 /*********************************
 *功能:freertos task 输出log后将自己挂起
 *参数:无
@@ -35,6 +38,7 @@ static void logger_thread(void *arg)
 		vTaskSuspend(NULL);
 	}
 }
+
 /***********************************************
 *功能:IDLE hook,configUSE_IDLE_HOOK必须为1才可用
 *没执行一次IDLE task 则调用一次，不可有阻塞
@@ -47,6 +51,7 @@ void vApplicationIdleHook( void )
     vTaskResume(m_logger_thread);
 #endif
 }
+#endif
 
 
 /***********************************************
@@ -105,7 +110,7 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt,void *context)
 			NRF_LOG_INFO("Timeout");
 			break;
 		case BLE_GAP_EVT_ADV_SET_TERMINATED:
-			advertising_free_stop();
+			advertising_stop();
 			NRF_LOG_INFO("advertising terminated");
 			break;
 		case BLE_GATTS_EVT_HVN_TX_COMPLETE:
@@ -157,7 +162,6 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt,void *context)
 			NRF_LOG_INFO("BLE_GATTC_EVT_CHAR_VAL_BY_UUID_READ_RSP");
 			break;
 		default:
-
 			NRF_LOG_INFO("%d: %s: %d:",p_ble_evt->header.evt_id ,__func__,__LINE__);
 			break;
 	}
@@ -285,7 +289,7 @@ void main_log_init(void)
 	//初始化RTT
 	NRF_LOG_DEFAULT_BACKENDS_INIT();
 	G_CHECK_ERROR_CODE_INFO(err_code);
-#if NRF_LOG_ENABLED
+#if NRF_LOG_ENABLED && USE_FREERTOS
 	if(pdPASS != xTaskCreate(logger_thread,"LOGGER",256,NULL,1,&m_logger_thread))
 	{
 		APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
@@ -672,14 +676,22 @@ void PostSleepProcessing(uint32_t ulExpectedIdleTime)
 {
 
 }
- 
-int main(void)
+
+void MotorPinInit(void)
+{
+	nrf_gpio_cfg(16,NRF_GPIO_PIN_DIR_OUTPUT,NRF_GPIO_PIN_INPUT_DISCONNECT,NRF_GPIO_PIN_PULLDOWN,NRF_GPIO_PIN_S0S1,NRF_GPIO_PIN_NOSENSE);
+}
+#define SCREEN_LCD_LED_PIN	15
+
+ int main(void)
 {
 	ret_code_t err_code;
 	bool ret;
-        uint8_t a = 0x67;
+  uint8_t a = 0x67;
+	uint8_t advertisingButton = 0;
 	main_log_init();
 	main_lfclk_config();
+#if 1
 //	power_management_init();
 	SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
 	ble_stack_init();
@@ -690,25 +702,69 @@ int main(void)
 	
 	conn_params_init();
 	peer_manager_init();
-//  CommonWatchDogInit();
-  //   TwiDriverInit(MPU6050);
-// I2cSimulationInit();
-// test();
-// MPU_Read_Length();
-	uart_init();
+#endif
+// CommonWatchDogInit();	//watchdog init
+// TwiDriverInit(MPU6050);//hardware iic init
+// I2cSimulationInit();   //software iic init
+//	uart_init();					//hardware uart init
+//	MotorPinInit();				//motor init
+//nrf_gpio_cfg_output(SCREEN_LCD_LED_PIN);
+//nrf_gpio_pin_set(SCREEN_LCD_LED_PIN);
 
-	while( a = mpu_dmp_init())
+//SPI_HardWareInit();				//spi hardware init
+ //SPI_Init();
+//while(1)
+//{
+//SPI_WriteCommand(0xDA);
+//SPI_WriteData(0x88);
+//nrf_delay_ms(50);
+//}
+//SPI_WriteData(0x88);
+ST7789_Init();
+//	LCD_Init();
+//	SPI_SoftWareInit();
+//nrf_delay_ms(2000);	
+//ST7789_Init();
+  //LCD_Init();
+//ST7789_Init();
+// ST7789_Fill_Color(WHITE);
+
+ST7789_PictureDraw(gImage_bmp,sizeof(gImage_bmp));
+
+//test1();
+//IT725X_Init();
+
+while(1);
+
+
+	/*MPU_Init();						//mpu6050 module init
+	 while( a = mpu_dmp_init())
 		{
-                  NRF_LOG_INFO("mpu_dmp_init error:%d",a);
+        NRF_LOG_INFO("mpu_dmp_init error:%d",a);
 		}
+*/
+/*	mpu6050 interrupt configure 有bug
+	MPU_INT_Init();
+  MPU_Pin_int();
+  */
+
+#if 1
+
+#endif
+
 
 NRF_LOG_INFO("mpu_dmp_init success");
-/*while(1)
-{
-	while(app_uart_put(a) != NRF_SUCCESS);
-}*/
-   task_init();
-   nrf_sdh_freertos_init(NULL,NULL);
+
+//advertisingButton = OPEN;
+advertisingButton = CLOSE;
+
+#if USE_FREERTOS 
+#if USE_TASK
+ task_init();
+#endif
+
+
+ nrf_sdh_freertos_init(advertising_button,&advertisingButton);
 
    vTaskStartScheduler();
 
@@ -716,5 +772,11 @@ NRF_LOG_INFO("mpu_dmp_init success");
     {
         APP_ERROR_HANDLER(NRF_ERROR_FORBIDDEN);
     }
+#else
+    advertising_button(&advertisingButton);
+	  for (;;)
+    {
+    }
+#endif
 }
 

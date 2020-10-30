@@ -10,7 +10,7 @@
 
 "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\CONFIG\debugger\NordicSemi\nRF52832_xxAA.ddf" 
 
-"--semihosting" 
+"--semihosting=none" 
 
 "--device=nRF52832_xxAA" 
 

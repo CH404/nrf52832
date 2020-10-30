@@ -21,15 +21,18 @@
 #define SCREEN_TOUCH_SDA_PIN 2
 #define SCREEN_TOUCH_SCL_PIN 3
 
+#define MPU6050_INT_PIN	25
 #define MPU6050_SCL_PIN 26
 #define MPU6050_SDA_PIN 27
 
 #define MAX30102_SDA_PIN 4
 #define MAX30102_SCL_PIN 5
 
+#define TWI0_SDA_PIN 5
+#define TWI0_SCL_PIN 6
 
-#define SIMULATION_IIC_SCL_PIN MPU6050_SCL_PIN
-#define SIMULATION_IIC_SDA_PIN MPU6050_SDA_PIN
+#define SIMULATION_IIC_SCL_PIN TWI0_SCL_PIN
+#define SIMULATION_IIC_SDA_PIN TWI0_SDA_PIN
 
 #define GPIO_PORT_OUT (NRF_P0->OUT)
 #define GPIO_PORT_DIR (NRF_P0->DIR)
@@ -70,8 +73,20 @@ MPU6050,
 MAX30102
 }deviceName;
 
-TWI_EXT ret_code_t TwiDriverInit(deviceName name);
-TWI_EXT ret_code_t TwiDriverSend( uint8_t address, uint8_t * p_data, size_t length);
+//************************************IT7251 twi start*********************************************//
+typedef struct
+{
+	uint8_t address;
+	uint8_t *command;
+	uint8_t command_length;
+	uint8_t *receive_data;
+	uint8_t recevice_length;
+}TWI_IT725x_Config;
+//************************************IT7251 twi end*********************************************//
+
+
+//TWI_EXT ret_code_t TwiDriverInit(deviceName name);
+//TWI_EXT ret_code_t TwiDriverSend( uint8_t address, uint8_t * p_data, size_t length);
 //TWI_EXT void test(void);
 TWI_EXT uint8_t I2c_Tx(uint8_t address, uint8_t const * pdata,uint16_t length,bool noStop,bool startAndAdd,uint8_t repetitionCnt);
 TWI_EXT uint8_t I2c_Rx(uint8_t address, uint8_t *const  pdata,uint16_t length,uint8_t repetitionCnt);

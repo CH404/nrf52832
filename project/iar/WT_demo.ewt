@@ -2381,6 +2381,9 @@
             <name>$PROJ_DIR$\..\..\app\ble_date.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\app\bmp.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\app\common.c</name>
         </file>
         <file>
@@ -2391,6 +2394,12 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\global.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\app\it725x.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\app\lcd.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\main.c</name>
@@ -2409,6 +2418,12 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\app\service.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\app\spi.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\app\st7789.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\app\twi.c</name>
@@ -2467,6 +2482,9 @@
         <file>
             <name>$PROJ_DIR$\..\..\external\freertos\source\timers.c</name>
         </file>
+    </group>
+    <group>
+        <name>GuiLite</name>
     </group>
     <group>
         <name>My_libraries</name>
@@ -2540,16 +2558,34 @@
             <name>$PROJ_DIR$\..\..\integration\nrfx\legacy\nrf_drv_clock.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\integration\nrfx\legacy\nrf_drv_spi.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\integration\nrfx\legacy\nrf_drv_twi.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\integration\nrfx\legacy\nrf_drv_uart.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\modules\nrfx\drivers\src\nrfx_clock.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\modules\nrfx\drivers\src\nrfx_gpiote.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\modules\nrfx\drivers\src\nrfx_rtc.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\modules\nrfx\drivers\src\nrfx_spi.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\modules\nrfx\drivers\src\nrfx_spim.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\modules\nrfx\drivers\src\nrfx_twi.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\modules\nrfx\drivers\src\nrfx_twim.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\modules\nrfx\drivers\src\nrfx_uart.c</name>

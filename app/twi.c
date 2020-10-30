@@ -10,35 +10,36 @@ nrfx_err_t nrfx_twi_tx(nrfx_twi_t const * p_instance, twi句柄
 
 #define TWI_GLOBAL
 #include "global.h"
+#include "nrf_drv_twi.h"
 #include "twi.h"
 #include "nrfx_timer.h"
 #include "nrf_delay.h"
+#include "nrf_drv_gpiote.h"
+#include "it725x.h"
 //使能twi模块
 //1、sdk_config.h 中使能twi的库函数
 //2、实例化twi handle
 //3、配置初始化
+#if 1
+#define TWI0_SDA_PIN 5
+#define TWI0_SCL_PIN 6
+#define INT_PIN 4
 
-#define TWI_SCL_PIN 26
-#define TWI_SDA_PIN  27
-#define TWI_INSTANCE_ID 0
-static const nrfx_twi_t m_twi = NRFX_TWI_INSTANCE(TWI_INSTANCE_ID);
-
-ret_code_t TwiInit(void)
+#define HWTWI0
+#ifdef HWTWI0
+static const nrf_drv_twi_t twi0 = NRF_DRV_TWI_INSTANCE(0);
+#endif
+#ifdef HWTWI1
+static const nrf_drv_twi_t twi1 = NRF_DRV_TWI_INSTANCE(1)
+#endif
+//bool twi_done = false;
+void twi_handler(nrf_drv_twi_evt_t const *p_evt,void *p_context)
 {
-	nrfx_twi_config_t config = NRFX_TWI_DEFAULT_CONFIG;
-	config.scl = TWI_SCL_PIN;
-	config.sda = TWI_SDA_PIN;
-	nrfx_twi_init(&m_twi,&config,NULL,NULL);
-}
-
-bool twi_done = false;
-void twi_handler(nrfx_twi_evt_t const *p_evt,void *p_context)
-{
-  switch(p_evt->type)
-  	{
-  		case NRFX_TWI_EVT_DONE:
+	switch(p_evt->type)
+		{
+			case NRFX_TWI_EVT_DONE:
 				NRF_LOG_INFO("NRFX_TWI_EVT_DONE");
-                                twi_done = true;
+			//	twi_done = true;
 				break;
 			case NRFX_TWI_EVT_ADDRESS_NACK:
 				NRF_LOG_INFO("address Nack");
@@ -52,35 +53,46 @@ void twi_handler(nrfx_twi_evt_t const *p_evt,void *p_context)
 			case NRFX_TWI_EVT_OVERRUN:
 				NRF_LOG_INFO("overrun");
 				break;
-  	}
-}
-
-ret_code_t TwiDriverInit(deviceName name)
-{
-	ret_code_t err_code;
-	//配置参数
-	nrfx_twi_config_t config = NRFX_TWI_DEFAULT_CONFIG;
-	switch(name)
-		{
-			case MPU6050:
-			config.scl = MPU6050_SCL_PIN;
-			config.sda = MPU6050_SDA_PIN;
-			break;
-			default:
-				break;
 		}
-		//初始化，不提供event_handler,twi阻塞模式
-	err_code =	nrfx_twi_init(&m_twi,&config,twi_handler,NULL);
-	G_CHECK_ERROR_CODE_INFO(err_code);
-
-	nrfx_twi_enable(&m_twi);
-
 }
 
-ret_code_t TwiDriverSend( uint8_t address, uint8_t * p_data, size_t length)
+#if defined (HWTWI0) || defined (HWTWI1)
+/************************************************
+说明:TWI 初始化
+函数名:ret_code_t TwiInit(void)
+参数:
+返回值:
+**************************************************/
+ret_code_t TWI_Init(void)
 {
-	return nrfx_twi_tx(&m_twi,address,p_data,length,true);
+	nrf_drv_twi_config_t config = NRFX_TWI_DEFAULT_CONFIG;
+        ret_code_t err_code;
+#ifdef HWTWI0
+	config.scl = TWI0_SCL_PIN;
+	config.sda = TWI0_SDA_PIN;
+	config.frequency = NRF_DRV_TWI_FREQ_100K;
+        config.interrupt_priority = APP_IRQ_PRIORITY_HIGH,
+        config.clear_bus_init     = false;
+	err_code = nrf_drv_twi_init(&twi0,&config,NULL,NULL);
+  G_CHECK_ERROR_CODE_INFO(err_code);
+	 nrf_drv_twi_enable(&twi0);
+#endif
+#ifdef HWTWI1
+	config.scl = TWI1_SCL_PIN;
+	config.sda = TWI1_SDA_PIN;
+	nrf_drv_twi_init(&twi1,&config,NULL,NULL);
+         nrf_drv_twi_enable(&twi1);
+#endif 
 }
+ret_code_t TWI_Send(nrf_drv_twi_t const * p_instance,uint8_t address, uint8_t * p_data, size_t length)
+{
+	return nrf_drv_twi_tx(p_instance,address,p_data,length,true);
+}
+
+#endif
+
+
+
 
 
 #define MPU6050_ADDRESS 0x68
@@ -88,6 +100,7 @@ ret_code_t TwiDriverSend( uint8_t address, uint8_t * p_data, size_t length)
 #define CMD_READ 0xD1
 
 #define WHO_AM_I_ADDRESS 0x75
+#define IT725X_ADDRESS 0x46
 /*
 	IIC通信,
 	1、主机发送起始信号，发送低7位从器件地址+高第8位W/R,
@@ -96,40 +109,278 @@ ret_code_t TwiDriverSend( uint8_t address, uint8_t * p_data, size_t length)
 	3、W 发送8位数据/ 放弃SCL, R 接收8位数据
 
 */
-#if 0
-void test(void)
+#if 1
+uint8_t pointDataBuff[255];
+uint8_t gesture_rxbuff[0x0E] = {0xA0};
+void test_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
-	ret_code_t err = 0;
+  ret_code_t err_code;
+  uint8_t tx2_buff[1]={0x80};
+  uint8_t rx_buff[2] = {0x00};
+uint8_t pointDataAdrees = 0xE0;
+	uint8_t gesture_txbuff[]={0x20,0x01,0x05};		
+			if(action == NRF_GPIOTE_POLARITY_LOTOHI)
+				{
+				NRF_LOG_INFO("LOTOHI");
+
+				}
+			else if(action == NRF_GPIOTE_POLARITY_HITOLO)
+				{
+                                twimake :				NRF_LOG_INFO("HITOLO");
+                                                             
+err_code = nrf_drv_twi_tx(&twi0,IT725X_ADDRESS,tx2_buff,1,false);
+G_CHECK_ERROR_CODE_INFO(err_code);
+err_code = nrf_drv_twi_rx(&twi0,IT725X_ADDRESS,rx_buff,1);
+G_CHECK_ERROR_CODE_INFO(err_code);
+NRF_LOG_INFO("data %d",rx_buff[0]);
+if((rx_buff[0]&0x03) == 0x00)
+{
+	//NRF_LOG_INFO("data %d",rx_buff[0]);
+	if(rx_buff[0]&0x80)	//new packet
+		{
+			NRF_LOG_INFO("new packet");
+			err_code = nrf_drv_twi_tx(&twi0,IT725X_ADDRESS,&pointDataAdrees,1,true);
+			G_CHECK_ERROR_CODE_INFO(err_code);
+			err_code = nrf_drv_twi_rx(&twi0,IT725X_ADDRESS,pointDataBuff,6);
+			G_CHECK_ERROR_CODE_INFO(err_code);
+			//NRF_LOG_INFO("read point data end");
+       NRF_LOG_INFO("x:%d,y:%d",pointDataBuff[2],pointDataBuff[4]);
+       NRF_LOG_INFO("pressure: %d",pointDataBuff[5]);
+			
+	/*		err_code = nrf_drv_twi_tx(&twi0,IT725X_ADDRESS,&pointDataAdrees,1,true);
+			G_CHECK_ERROR_CODE_INFO(err_code);
+			err_code = nrf_drv_twi_rx(&twi0,IT725X_ADDRESS,pointDataBuff,14);
+			G_CHECK_ERROR_CODE_INFO(err_code);
+			//NRF_LOG_INFO("read point data end");
+       NRF_LOG_INFO("head:%d",pointDataBuff[0]);*/
+/*
+err_code = nrf_drv_twi_tx(&twi0,IT725X_ADDRESS,gesture_txbuff,3,false);
+G_CHECK_ERROR_CODE_INFO(err_code);
+err_code = nrf_drv_twi_tx(&twi0,IT725X_ADDRESS,gesture_rxbuff,1,true);	//read interrupt information
+G_CHECK_ERROR_CODE_INFO(err_code);
+err_code = nrf_drv_twi_rx(&twi0,IT725X_ADDRESS,gesture_rxbuff,0x0E);
+G_CHECK_ERROR_CODE_INFO(err_code);
+NRF_LOG_INFO("%d,%d,%d,%d,%d,%d",gesture_rxbuff[4],gesture_rxbuff[5],gesture_rxbuff[6],gesture_rxbuff[7],gesture_rxbuff[8],gesture_rxbuff[9]);*/
+		}
+	else if((rx_buff[0]&0x40))
+		{
+			NRF_LOG_INFO("No packet but finger/pen still touched");
+		}
+}
+else if((rx_buff[0]&0x03) == 0x01)
+{
+	NRF_LOG_INFO("IIC bus busy");
+	nrf_delay_ms(500);
+}
+else if(rx_buff[0]&0x02)
+{
+	NRF_LOG_INFO("IIC bus ERROR");
+	//nrf_delay_ms(500);
+  
+      //  goto twimake;
+        		//	NRF_LOG_INFO("new packet");
+			err_code = nrf_drv_twi_tx(&twi0,IT725X_ADDRESS,&pointDataAdrees,1,true);
+			G_CHECK_ERROR_CODE_INFO(err_code);
+			err_code = nrf_drv_twi_rx(&twi0,IT725X_ADDRESS,pointDataBuff,14);
+			G_CHECK_ERROR_CODE_INFO(err_code);
+			//NRF_LOG_INFO("read point data end");
+       NRF_LOG_INFO("x:%d,y:%d",pointDataBuff[2],pointDataBuff[4]);
+       err_code = nrf_drv_twi_tx(&twi0,IT725X_ADDRESS,tx2_buff,1,false);
+G_CHECK_ERROR_CODE_INFO(err_code);
+err_code = nrf_drv_twi_rx(&twi0,IT725X_ADDRESS,rx_buff,1);
+G_CHECK_ERROR_CODE_INFO(err_code);
+NRF_LOG_INFO("data %d",rx_buff[0]);
+      return;
+       
+}
+                                
+                                
+                                
+                                
+                                
+				}
+			else
+				{
+				NRF_LOG_INFO("TOGGLE");
+				}
+                        
+}
+  uint8_t tx2_buff[]=0x80;
+uint8_t pointDataAdrees = 0xE0;
+uint8_t rx_buff[2] = {0xA0};
+void test1(void)
+{
+	ret_code_t err_code = 0;
         uint8_t i;
-	uint8_t data_buff[1];
-	uint8_t rx_data_buff[3] = {0};
-	data_buff[0] = WHO_AM_I_ADDRESS;
+	uint8_t rx_data_buff[10] = {0};
+	uint8_t data_buff[] = {0x20,0x00};
+        uint8_t data1_buff[] = {0xA0};
+	nrf_gpio_cfg_output(7);
+        nrf_gpio_pin_clear(7);
+//	nrf_gpio_cfg_output(4);
+//	nrf_gpio_pin_set(4);
+       // I2cSimulationInit();
+        nrf_delay_ms(1000);
+        nrf_gpio_pin_set(7);
+         nrf_delay_ms(1000);
+ TWI_Init();
+
+
+//发送命令 后再读
+#if 0
+  err_code =  nrf_drv_twi_tx(&twi0,IT725X_ADDRESS,data_buff,2,false);
+  G_CHECK_ERROR_CODE_INFO(err_code);
+  err_code =  nrf_drv_twi_tx(&twi0,IT725X_ADDRESS,data1_buff,1,true);
+   G_CHECK_ERROR_CODE_INFO(err_code);
+   err_code =  nrf_drv_twi_rx(&twi0,IT725X_ADDRESS,rx_data_buff,10);
+  G_CHECK_ERROR_CODE_INFO(err_code);
+#endif
+
+#if 1
+//中断读
+//配置host中断
+//使用gpiote
+err_code = nrf_drv_gpiote_init();
+nrf_drv_gpiote_in_config_t config = NRFX_GPIOTE_CONFIG_IN_SENSE_HITOLO(true);
+config.pull = NRF_GPIO_PIN_PULLUP;
+err_code = nrf_drv_gpiote_in_init(INT_PIN,&config,test_handler);
+G_CHECK_ERROR_CODE_INFO(err_code);
+nrf_drv_gpiote_in_event_enable(INT_PIN,true);
+#else 
+IT725X_InterruptInit();
+#endif
+
+
+#if 0
+uint8_t idle_gesture[]={0x20,0x15,0x87,0x00,0x00,0x23,0x80};
+uint8_t rx_idle_gesture[2]={0xA0};
+err_code = nrf_drv_twi_tx(&twi0,IT725X_ADDRESS,idle_gesture,7,false);
+G_CHECK_ERROR_CODE_INFO(err_code);
+err_code = nrf_drv_twi_tx(&twi0,IT725X_ADDRESS,rx_idle_gesture,1,true);
+G_CHECK_ERROR_CODE_INFO(err_code);
+err_code = nrf_drv_twi_rx(&twi0,IT725X_ADDRESS,rx_idle_gesture,2);
+G_CHECK_ERROR_CODE_INFO(err_code)
+	NRF_LOG_INFO("enable:%d %d",rx_idle_gesture[0],rx_idle_gesture[1]);
+#endif
+
+#if 0
+uint8_t tx_read[] = {0x20,0x18,0x07};
+uint8_t rx_read[2] = {0xA0};
+err_code = nrf_drv_twi_tx(&twi0,IT725X_ADDRESS,tx_read,3,false);
+G_CHECK_ERROR_CODE_INFO(err_code);
+err_code = nrf_drv_twi_tx(&twi0,IT725X_ADDRESS,rx_read,1,true);
+G_CHECK_ERROR_CODE_INFO(err_code);
+err_code = nrf_drv_twi_rx(&twi0,IT725X_ADDRESS,rx_read,2);
+G_CHECK_ERROR_CODE_INFO(err_code);
+NRF_LOG_INFO("read:%d %d",rx_read[0],rx_read[1]);
+
+#endif
+
+
+
+#if 1
+uint8_t tx1_buff[] = {0x20,0x02,0x04,0x01,0x00};
+uint8_t rx1_buff[2] = {0xA0};
+err_code = nrf_drv_twi_tx(&twi0,IT725X_ADDRESS,tx1_buff,5,false);	//set interrupt
+G_CHECK_ERROR_CODE_INFO(err_code);
+err_code = nrf_drv_twi_rx(&twi0,IT725X_ADDRESS,rx1_buff,2);
+G_CHECK_ERROR_CODE_INFO(err_code);
+NRF_LOG_INFO("enable:%d %d",rx1_buff[0],rx1_buff[1]);
+#endif 
+
+
+//nrf_delay_ms(1000);
+#if 1
+uint8_t tx_buff[] = {0x20,0x01,0x04};
+uint8_t rx_buff[2] = {0xA0};
+err_code = nrf_drv_twi_tx(&twi0,IT725X_ADDRESS,tx_buff,3,false);
+G_CHECK_ERROR_CODE_INFO(err_code);
+err_code = nrf_drv_twi_tx(&twi0,IT725X_ADDRESS,rx_buff,1,true);	//read interrupt information
+G_CHECK_ERROR_CODE_INFO(err_code);
+err_code = nrf_drv_twi_rx(&twi0,IT725X_ADDRESS,rx_buff,2);
+G_CHECK_ERROR_CODE_INFO(err_code);
+NRF_LOG_INFO("enable:%d %d",rx_buff[0],rx_buff[1]);
+#endif
+while(1)
+{
+#if 0
+
+err_code = nrf_drv_twi_tx(&twi0,IT725X_ADDRESS,tx2_buff,1,true);
+G_CHECK_ERROR_CODE_INFO(err_code);
+err_code = nrf_drv_twi_rx(&twi0,IT725X_ADDRESS,rx_buff,1);
+G_CHECK_ERROR_CODE_INFO(err_code);
+if((rx_buff[0]&0x03)== 0x00)
+{
+	//NRF_LOG_INFO("data %d",rx_buff[0]);
+	if(rx_buff[0]&0x80)	//new packet
+		{
+			NRF_LOG_INFO("new packet");
+			err_code = nrf_drv_twi_tx(&twi0,IT725X_ADDRESS,&pointDataAdrees,1,true);
+			G_CHECK_ERROR_CODE_INFO(err_code);
+			err_code = nrf_drv_twi_rx(&twi0,IT725X_ADDRESS,pointDataBuff,28);
+			G_CHECK_ERROR_CODE_INFO(err_code);
+			NRF_LOG_INFO("read point data end");
+
+		}
+	else if((rx_buff[0]&0x40))
+		{
+			NRF_LOG_INFO("No packet but finger/pen still touched");
+		}
+}
+else if((rx_buff[0]&0x03) == 0x01)
+{
+	NRF_LOG_INFO("IIC bus busy");
+	nrf_delay_ms(500);
+}
+else if((rx_buff[0]&0x02) == 0x02)
+{
+	NRF_LOG_INFO("IIC bus ERROR");
+	//while (1);
+        nrf_delay_ms(500);
+}
+#endif
+}
+
+
+
+
+
+
+
+
 	
-/*	//err = TwiDriverSend(READ_CMD,data_buff,1);
-     err =  nrfx_twi_tx(&m_twi,MPU6050_ADDRESS,data_buff,1,true);
+	//err = TwiDriverSend(READ_CMD,data_buff,1);
+//    err =  nrf_drv_twi_tx(&twi0,IT725X_ADDRESS,data_buff,0,true);
+//	NRF_LOG_INFO("twi %d",err_code);
+ //     while(twi_done == false);
+//	twi_done = false;
+//	err = nrf_drv_twi_rx(&twi0,IT725X_ADDRESS,rx_data_buff,10);
+//			 while(twi_done == false);
 	//NRF_LOG_INFO("twi %d",err);
-       while(twi_done == false);
-	twi_done = false;
-	err = nrfx_twi_rx(&m_twi,MPU6050_ADDRESS,rx_data_buff,1);
-			 while(twi_done == false);
-	//NRF_LOG_INFO("twi %d",err);
-	NRF_LOG_INFO("rx_data_buff %d",rx_data_buff[0]);
-*/
+//	NRF_LOG_INFO("rx_data_buff %d",rx_data_buff[0]);
+
 
 //发送器件地址+写命令
 //发送寄存器地址
 //发送器件地址+读命令
-I2c_Tx(MPU6050_ADDRESS,data_buff,1,true,1);
+//rx_data_buff[0] =  I2c_Rx_OneByte(IT725X_ADDRESS,0x00);
+//NRF_LOG_INFO("rx_data_buff %d",rx_data_buff[0]);
+//       I2c_Tx_OneByte(IT725X_ADDRESS,0x00,0x00);
+/*I2c_Tx(MPU6050_ADDRESS,data_buff,1,true,1);
 I2c_Rx(MPU6050_ADDRESS,rx_data_buff,3,1);
 NRF_LOG_INFO("0x%x",rx_data_buff[0]);
 NRF_LOG_INFO("0x%x",rx_data_buff[1]);
 NRF_LOG_INFO("0x%x",rx_data_buff[2]);
 	
-	
+	*/
 
 								
 }
 #endif
+
+#endif
+
+
 
 /***************************************
 * 函数名:uint8_t I2c_Tx_OneByte(uint8_t address, uint8_t reg,uint8_t data)
@@ -173,15 +424,15 @@ uint8_t I2c_Rx_OneByte(uint8_t address, uint8_t reg)
 	uint8_t data;
         bool retAck;
 	I2cSimulationStart();
-	retAck = I2cSimulationSendByte(address<<1|1);
+	retAck = I2cSimulationSendByte(address<<1|0);
 		if(!retAck)
 			return ERROR_ADDRESS_NO_ACK;
 	
 		retAck = I2cSimulationSendByte(reg);
 		if(!retAck)
 			return ERROR_TX_DATA_NO_ACK;
-
-			retAck = I2cSimulationSendByte(address<<1|0);
+                I2cSimulationStart();
+			retAck = I2cSimulationSendByte(address<<1|1);
 		if(!retAck)
 			return ERROR_TX_DATA_NO_ACK;
 		
@@ -339,7 +590,7 @@ void I2cSimulationStop(void)
 }
 bool I2cSimulationWaitAck(void)
 {
-uint8_t waitAckTime = 0;
+uint16_t waitAckTime = 0;
 	SDA_HIGH();
 	SDA_IN();
 	nrf_delay_us(5);
@@ -349,7 +600,7 @@ uint8_t waitAckTime = 0;
 	while (READ_SDA)
 		{
 			waitAckTime++;
-			if(waitAckTime>250)
+			if(waitAckTime>65534)
 				{
 					I2cSimulationStop();
 					return false;

@@ -3,6 +3,142 @@
 #include "twi.h"
 #include "app_uart.h"
 #include "nrf_uart.h"
+#include "nrf_gpio.h"
+#include "global.h"
+#include "nrf_drv_gpiote.h"
+#include "common.h"
+
+/***************************************
+* 函数名:void MPU_INT_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
+* 参数: 
+* 功能:gpiote event handler,接收到MPU中断，读取数据
+* 返回:
+****************************************/
+void MPU_INT_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
+{
+
+	BaseType_t pxHigherPriorityTaskWoken;
+  
+	if(pin == MPU6050_INT_PIN)
+		{
+			if(action == NRF_GPIOTE_POLARITY_HITOLO)
+				{
+				NRF_LOG_INFO("HITOLO");
+
+				}
+			else if(action == NRF_GPIOTE_POLARITY_LOTOHI)
+				{
+				NRF_LOG_INFO("LOTOHI");
+			//	xSemaphoreGiveFromISR(MPURdyDateSem, &pxHigherPriorityTaskWoken);
+			//	portYIELD_FROM_ISR(pxHigherPriorityTaskWoken);
+			//		xSemaphoreGive(MPURdyDateSem);
+				}
+			else
+				{
+				NRF_LOG_INFO("TOGGLE");
+				}
+		}
+}
+
+
+/***************************************
+* 函数名:void MPU_Pin_int(void)
+* 参数: 
+* 功能:配置mpu6050中断引脚
+* 返回:
+****************************************/
+void MPU_Pin_int(void)
+{
+	//使用event、task使用的是gpiote模块，pin使用gpiote则无法使用gpio,反之亦然
+	ret_code_t err_code;
+	err_code = nrf_drv_gpiote_init();//初始化gpiote模块
+	G_CHECK_ERROR_CODE_INFO(err_code);
+	//port event,所以的pin共用一个标志位,当一个pin产生port event后，还保持有效，DETECT信号就一直为高
+	//随后的pin的port event 都将被忽略，功耗非常低 下降沿触发
+	nrf_drv_gpiote_in_config_t config = GPIOTE_CONFIG_IN_SENSE_LOTOHI(true);
+//	nrf_drv_gpiote_in_config_t config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(true);
+	//pin event 一个引脚一个中断，最多只能配置8个，功耗高，下降沿触摸
+//	nrf_drv_gpiote_in_config_t config = GPIOTE_CONFIG_IN_SENSE_HITOLO(true)
+
+	 config.pull = NRF_GPIO_PIN_PULLDOWN;
+
+	nrf_drv_gpiote_in_init(MPU6050_INT_PIN,&config,MPU_INT_handler);
+	nrf_drv_gpiote_in_event_enable(MPU6050_INT_PIN,true);
+	
+
+	
+/*uint32_t aa;
+nrf_gpio_cfg_input(MPU6050_INT_PIN,NRF_GPIO_PIN_PULLUP);
+aa= 	nrf_gpio_pin_read(MPU6050_INT_PIN);
+NRF_LOG_INFO("%d",aa);*/
+
+	
+}
+/***************************************
+* 函数名:void MPU_Fall_Interrupt(void)
+* 参数: 
+* 功能:配置自由落体中断
+* 返回:
+****************************************/
+void MPU_Fall_Interrupt(void)
+{
+	I2c_Tx_OneByte(MPU_ADDR,MPU_FF_THR,0x01);
+	I2c_Tx_OneByte(MPU_ADDR,MPU_FF_DUR,0x01);
+}
+
+/***************************************
+* 函数名:void MPU_Motion_Interrupt(void)
+* 参数: 
+* 功能:配置自由落体中断
+* 返回:
+****************************************/
+void MPU_Motion_Interrupt(void)
+{
+	I2c_Tx_OneByte(MPU_ADDR,MPU_MOT_THR,0x05);
+	I2c_Tx_OneByte(MPU_ADDR,MPU_MOT_DUR,0x01);
+}
+/***************************************
+* 函数名:void MPU_Zero_Interrupt(void)
+* 参数: 
+* 功能:配置自由落体中断
+* 返回:
+****************************************/
+void MPU_Zero_Interrupt(void)
+{
+	I2c_Tx_OneByte(MPU_ADDR,MPU_ZRMOT_THR,0x20);
+	I2c_Tx_OneByte(MPU_ADDR,MPU_ZRMOT_DUR,0x20);
+}
+
+/***************************************
+* 函数名:void MPU_INT_Iint(void)
+* 参数: 
+* 功能:配置mpu6050引脚中断
+* 返回:
+****************************************/
+void MPU_INT_Init(void)
+{
+	ret_code_t err_code;
+	
+	MPU_Motion_Interrupt();
+//	I2c_Tx_OneByte(MPU_ADDR,MPU_CFG_REG,0x04);
+	//I2c_Tx_OneByte(MPU_ADDR,MPU_ACCEL_CFG_REG,0x1C);
+	//I2c_Tx_OneByte(MPU_ADDR,MPU_GYRO_CFG_REG,0x1C);
+err_code = I2c_Tx_OneByte(MPU_ADDR,MPU_INTBP_CFG_REG,0x30);
+if(err_code != SUCCESS_I2C)
+{
+	while(1);
+}
+
+
+//	I2c_Tx_OneByte(MPU_ADDR,MPU_INT_EN_REG,0x01);	//数据就绪中断
+err_code = I2c_Tx_OneByte(MPU_ADDR,MPU_INT_EN_REG,0x40);	//运动检测中断
+if(err_code != SUCCESS_I2C)
+{
+	while(1);
+}
+
+}
+
 uint8_t MPU_Init(void)
 {
 	uint8_t rx_data = 0;
@@ -17,7 +153,8 @@ uint8_t MPU_Init(void)
 	I2c_Tx_OneByte(MPU_ADDR,MPU_USER_CTRL_REG,0X00);	//IIC主模式关闭
 	I2c_Tx_OneByte(MPU_ADDR,MPU_FIFO_EN_REG,0X00);		//关闭FIFO
 	I2c_Tx_OneByte(MPU_ADDR,MPU_INTBP_CFG_REG,0X80);	//INT引脚低有效
-	
+	rx_data = I2c_Rx_OneByte(MPU_ADDR,MPU_INTBP_CFG_REG);
+        NRF_LOG_INFO("%d",rx_data);
 	rx_data = I2c_Rx_OneByte(MPU_ADDR,MPU_DEVICE_ID_REG);
 	if(rx_data == MPU_ADDR)
 		{
@@ -290,7 +427,36 @@ void usart1_report_imu(short aacx,short aacy,short aacz,short gyrox,short gyroy,
 } 
 
 
-void MPU_task(void *parameters)
+
+void MPU_Read(void)
+{
+  uint8_t reg = 0;
+  unsigned char enable;
+	float pitch;
+	float roll;
+	float yaw;
+		short aacx,aacy,aacz;		//加速度传感器原始数据
+	short gyrox,gyroy,gyroz;	//陀螺仪原始数据
+	short temp;	
+	uint8_t report=1;
+	uint32_t a;
+			if(0 == mpu_dmp_get_data(&pitch,&roll,&yaw))
+				{
+		//			temp = MPU_Get_Temperature();
+		//			MPU_Get_Accelerometer(&aacx,&aacy,&aacz);	//得到加速度传感器数据
+		//	MPU_Get_Gyroscope(&gyrox,&gyroy,&gyroz);	//得到陀螺仪数据
+		//	if(report)mpu6050_send_data(aacx,aacy,aacz,gyrox,gyroy,gyroz);//用自定义帧发送加速度和陀螺仪原始数据
+			//	vTaskDelay(200);
+		//	if(report)usart1_report_imu(aacx,aacy,aacz,gyrox,gyroy,gyroz,(int)(roll*100),(int)(pitch*100),(int)(yaw*10));
+		//app_uart_put(report);
+		
+        NRF_LOG_INFO("roll:" NRF_LOG_FLOAT_MARKER , NRF_LOG_FLOAT(roll));
+        NRF_LOG_INFO("pitch:" NRF_LOG_FLOAT_MARKER , NRF_LOG_FLOAT(pitch));
+        NRF_LOG_INFO("yaw:" NRF_LOG_FLOAT_MARKER "\r\n", NRF_LOG_FLOAT(yaw));
+		}
+}
+
+/*void MPU_task(void *parameters)
 {
 	float pitch;
 	float roll;
@@ -299,8 +465,10 @@ void MPU_task(void *parameters)
 	short gyrox,gyroy,gyroz;	//陀螺仪原始数据
 	short temp;	
 	uint8_t report=1;
+	uint32_t a;
 	while(1)
 		{
+			xSemaphoreTake(MPURdyDateSem,portMAX_DELAY);
 			if(0 == mpu_dmp_get_data(&pitch,&roll,&yaw))
 				{
 					temp = MPU_Get_Temperature();
@@ -310,9 +478,12 @@ void MPU_task(void *parameters)
 			//	vTaskDelay(200);
 			if(report)usart1_report_imu(aacx,aacy,aacz,gyrox,gyroy,gyroz,(int)(roll*100),(int)(pitch*100),(int)(yaw*10));
 		//app_uart_put(report);
-		vTaskDelay(200);
+		    NRF_LOG_INFO("roll:" NRF_LOG_FLOAT_MARKER , NRF_LOG_FLOAT(roll));
+        NRF_LOG_INFO("pitch:" NRF_LOG_FLOAT_MARKER , NRF_LOG_FLOAT(pitch));
+        NRF_LOG_INFO("yaw:" NRF_LOG_FLOAT_MARKER "\r\n", NRF_LOG_FLOAT(yaw));
+
 			}
 		}
 }
-
+*/
 

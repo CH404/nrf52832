@@ -5,8 +5,6 @@
 #include <stdbool.h>
 #include "ble_types.h"
 #include "nrf_log.h"
-#include "FreeRTOS.h"
-#include "event_groups.h"
 
 #ifdef COMMON_GLOBAL
 #define COMMON_EXT
@@ -20,14 +18,12 @@
 
 
 
-#define RTC_UPDATE_EVENT_BIT 0x01
-#define WDT_FEED_EVT_WAIT_BIT  0x01
 
 
-COMMON_EXT void WdtFeedTask (void *paramenters);
+//COMMON_EXT void WdtFeedTask (void *paramenters);
 
-COMMON_EXT TaskHandle_t wdtFeedTaskHanle;
-COMMON_EXT EventGroupHandle_t wdtFeedEventHandle;
+//COMMON_EXT TaskHandle_t wdtFeedTaskHanle;
+//COMMON_EXT EventGroupHandle_t wdtFeedEventHandle;
 
 
 
@@ -43,15 +39,18 @@ COMMON_EXT void CommonWatchDogInit(void);
 
 
 
+
 #define VERSION_DEBUG
 #ifdef VERSION_DEBUG
 #define G_CHECK_ERROR_CODE_INFO(err_code)    if(err_code != NRF_SUCCESS)\
-{																									\
+{												\
 	NRF_LOG_DEBUG("Function: %s error code: %s line: %d.",__func__,NRF_LOG_ERROR_STRING_GET(err_code),__LINE__);\
 }
 #else
-#define G_CHECK_ERROR_CODE_INFO(err_code)    if(err_code != NRF_SUCCESS)\																									\
-          while(1);
+#define G_CHECK_ERROR_CODE_INFO(err_code)    if(err_code != NRF_SUCCESS)\
+{                                                                        \
+          while(1);                     \
+}
 #endif
 
 
