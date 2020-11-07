@@ -2,7 +2,7 @@
 #include "nrf_delay.h"
 #include "spi.h"
 #include "nrf_gpio.h"
-#include "bmp.h"
+//#include "bmp.h"
 
 #define ST7789_UnSelect SPI_CS_Release
 #define ST7789_Select SPI_CS_Select
@@ -109,12 +109,13 @@ void ST7789_DrawPixel(uint16_t x, uint16_t y, uint16_t color)
 	ST7789_UnSelect();
 }
 
-void ST7789_PictureDraw(const uint8_t *pic,uint32_t size)
+void ST7789_PictureDraw(uint16_t x, uint16_t y,const uint8_t *pic,uint32_t size)
 {
   uint32_t remain = size;
 	uint32_t count = 0;
   remain-=8;
-    ST7789_SetAddressWindow(0, 0,ST7789_WIDTH-1,ST7789_HEIGHT-1);     
+			ST7789_SetAddressWindow(x,y,pic[3]+x-1,pic[5]+y-1);
+  //  ST7789_SetAddressWindow(0, 0,ST7789_WIDTH-1,ST7789_HEIGHT-1);     
   while(remain)
   {
     size = (remain >ST7789_MAX_TX_BUFF)?ST7789_MAX_TX_BUFF:remain;
@@ -124,6 +125,89 @@ void ST7789_PictureDraw(const uint8_t *pic,uint32_t size)
     ST7789_WriteDataLength(ST7789_TXBuffer,size);
   }
   ST7789_WriteCommand(0x29); 
+}
+
+void ST7789_WriteChar(uint16_t x, uint16_t y, char ch, FontDef font, uint16_t color, uint16_t bgcolor)
+{
+	uint32_t i, b, j;
+	ST7789_Select();
+	ST7789_SetAddressWindow(x, y, x + font.width - 1, y + font.height - 1);
+
+	for (i = 0; i < font.height; i++) {
+		b = font.data[(ch - 32) * font.height + i];
+		for (j = 0; j < font.width; j++) {
+			if ((b << j) & 0x8000) {
+				uint8_t data[] = {color >> 8, color & 0xFF};
+				 ST7789_WriteDataLength(data,sizeof(uint16_t));
+			}
+			else {
+				uint8_t data[] = {bgcolor >> 8, bgcolor & 0xFF};
+				ST7789_WriteDataLength(data,sizeof(uint16_t));
+			}
+		}
+	}
+//	ST7789_UnSelect();
+}
+
+
+void ST7789_WriteString(uint16_t x, uint16_t y, const char *str, FontDef font, uint16_t color, uint16_t bgcolor)
+{
+	ST7789_Select();
+	while (*str) {
+		if (x + font.width >= ST7789_WIDTH) {
+			x = 0;
+			y += font.height;
+			if (y + font.height >= ST7789_HEIGHT) {
+				break;
+			}
+
+			if (*str == ' ') {
+				// skip spaces in the beginning of the new line
+				str++;
+				continue;
+			}
+		}
+		ST7789_WriteChar(x, y, *str, font, color, bgcolor);
+		x += font.width;
+		str++;
+	}
+//	ST7789_UnSelect();
+}
+void ST7789_DrawCircle(uint16_t x0, uint16_t y0, uint8_t r, uint16_t color)
+{
+	int16_t f = 1 - r;
+	int16_t ddF_x = 1;
+	int16_t ddF_y = -2 * r;
+	int16_t x = 0;
+	int16_t y = r;
+
+	ST7789_Select();
+	ST7789_DrawPixel(x0, y0 + r, color);
+	ST7789_DrawPixel(x0, y0 - r, color);
+	ST7789_DrawPixel(x0 + r, y0, color);
+	ST7789_DrawPixel(x0 - r, y0, color);
+
+	while (x < y) {
+		if (f >= 0) {
+			y--;
+			ddF_y += 2;
+			f += ddF_y;
+		}
+		x++;
+		ddF_x += 2;
+		f += ddF_x;
+
+		ST7789_DrawPixel(x0 + x, y0 + y, color);
+		ST7789_DrawPixel(x0 - x, y0 + y, color);
+		ST7789_DrawPixel(x0 + x, y0 - y, color);
+		ST7789_DrawPixel(x0 - x, y0 - y, color);
+
+		ST7789_DrawPixel(x0 + y, y0 + x, color);
+		ST7789_DrawPixel(x0 - y, y0 + x, color);
+		ST7789_DrawPixel(x0 + y, y0 - x, color);
+		ST7789_DrawPixel(x0 - y, y0 - x, color);
+	}
+//	ST7789_UnSelect();
 }
 
 #if 0
@@ -277,6 +361,25 @@ ST7789_WriteData( 0x20);
 }
 #endif
 
+/************************************************
+说明:ST7789 显示
+函数名:ST7789_display(void)
+返回值:
+**************************************************/
+void ST7789_Display(void)
+{
+	ST7789_WriteCommand(ST7789_DISPON); 
+}
+
+/************************************************
+说明:ST7789 关闭
+函数名:ST7789_display(void)
+返回值:
+**************************************************/
+void ST7789_UnDisplay(void)
+{
+	ST7789_WriteCommand(ST7789_DISPOFF); 
+}
 
 
 /************************************************
@@ -383,10 +486,17 @@ ST7789_WriteData( 0x28);
 ST7789_WriteData( 0x2E);   
 
 ST7789_WriteCommand(0x21); 
+ST7789_UnDisplay();
+ST7789_PictureDraw(0,0,gImage_bmp,sizeof(gImage_bmp));
+ST7789_Display();
 
-ST7789_WriteCommand(0x29);     
+//ST7789_WriteCommand(0x29);   
+//ST7789_Fill_Color(BLACK);
 
-ST7789_WriteCommand(0x2C);	//显示
+//ST7789_PictureDraw(gImage_bmp,sizeof(gImage_bmp));
+
+//ST7789_PictureDraw(78,40,gImage_ble,sizeof(gImage_ble));
+//ST7789_WriteCommand(0x2C);	
 }
 
 

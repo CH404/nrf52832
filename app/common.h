@@ -20,17 +20,7 @@
 
 
 
-//COMMON_EXT void WdtFeedTask (void *paramenters);
-
-//COMMON_EXT TaskHandle_t wdtFeedTaskHanle;
-//COMMON_EXT EventGroupHandle_t wdtFeedEventHandle;
-
-
-
-
-
-
-COMMON_EXT uint16_t  m_conn_handle;  
+COMMON_EXT uint16_t  m_conn_handle;  //ble 链接后的peer句柄,只存一个
 COMMON_EXT void CommonWatchDogInit(void);
 //COMMON_EXT bool WdtFeedTaskInit(void);
 
@@ -46,7 +36,7 @@ COMMON_EXT void CommonWatchDogInit(void);
 {												\
 	NRF_LOG_DEBUG("Function: %s error code: %s line: %d.",__func__,NRF_LOG_ERROR_STRING_GET(err_code),__LINE__);\
 }
-#else
+#else	//卡住等待看门狗复位
 #define G_CHECK_ERROR_CODE_INFO(err_code)    if(err_code != NRF_SUCCESS)\
 {                                                                        \
           while(1);                     \

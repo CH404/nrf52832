@@ -8,15 +8,13 @@
 #endif
 
 #include "nrf_drv_rtc.h"
-#include "FreeRTOS.h"
-#include "semphr.h"
-#include "timers.h"
 #include <stdint.h>
 #include <stdbool.h>
 //#include "ble.h"
 //#include "ble_srv_common.h"
 //#include "nrf_sdh_ble.h"
-
+#include "FreeRTOS.h"
+#include "semphr.h"
 typedef struct
 {
 	uint16_t year;
@@ -38,17 +36,19 @@ RTC_EXT real_time_t current_time;
 //#define RTC_UPDATE_TASK_PRIO 2
 //RTC_EXT TaskHandle_t RTCUpdateTaskHandle;
 //RTC_EXT void RTCUpdateTaskHandler(void *pvParamenters);
-
-//
 RTC_EXT SemaphoreHandle_t RTCUpdateSem;
+
+
+//RTC_EXT SemaphoreHandle_t RTCUpdateSem;
 //RTC_EXT TaskHandle_t RTCUpdateTaskHandle;
 
 RTC_EXT void RTC2_init(nrfx_rtc_handler_t handler);
-RTC_EXT void data_convert(real_time_t data,uint8_t * buff);
+RTC_EXT void data_convert(real_time_t data,char * datebuff,char* timebuff);
 RTC_EXT void update_time(real_time_t *current_time,uint32_t real_time);
 RTC_EXT void update_date(void);
 RTC_EXT bool RTC_semaphore_init(void);
 RTC_EXT void rtc_task_init(void);
+RTC_EXT void RTC2_enable(void);
 
 
 

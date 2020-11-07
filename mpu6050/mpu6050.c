@@ -427,63 +427,47 @@ void usart1_report_imu(short aacx,short aacy,short aacz,short gyrox,short gyroy,
 } 
 
 
-
+#if 0
 void MPU_Read(void)
 {
-  uint8_t reg = 0;
-  unsigned char enable;
+//  uint8_t reg = 0;
+//  unsigned char enable;
 	float pitch;
 	float roll;
 	float yaw;
-		short aacx,aacy,aacz;		//加速度传感器原始数据
-	short gyrox,gyroy,gyroz;	//陀螺仪原始数据
-	short temp;	
+//		short aacx,aacy,aacz;		//加速度传感器原始数据
+//	short gyrox,gyroy,gyroz;	//陀螺仪原始数据
+//	short temp;	
 	uint8_t report=1;
-	uint32_t a;
 			if(0 == mpu_dmp_get_data(&pitch,&roll,&yaw))
 				{
-		//			temp = MPU_Get_Temperature();
-		//			MPU_Get_Accelerometer(&aacx,&aacy,&aacz);	//得到加速度传感器数据
-		//	MPU_Get_Gyroscope(&gyrox,&gyroy,&gyroz);	//得到陀螺仪数据
-		//	if(report)mpu6050_send_data(aacx,aacy,aacz,gyrox,gyroy,gyroz);//用自定义帧发送加速度和陀螺仪原始数据
+//					temp = MPU_Get_Temperature();
+//					MPU_Get_Accelerometer(&aacx,&aacy,&aacz);	//得到加速度传感器数据
+//			MPU_Get_Gyroscope(&gyrox,&gyroy,&gyroz);	//得到陀螺仪数据
+//			if(report)mpu6050_send_data(aacx,aacy,aacz,gyrox,gyroy,gyroz);//用自定义帧发送加速度和陀螺仪原始数据
 			//	vTaskDelay(200);
-		//	if(report)usart1_report_imu(aacx,aacy,aacz,gyrox,gyroy,gyroz,(int)(roll*100),(int)(pitch*100),(int)(yaw*10));
+//			if(report)usart1_report_imu(aacx,aacy,aacz,gyrox,gyroy,gyroz,(int)(roll*100),(int)(pitch*100),(int)(yaw*10));
 		//app_uart_put(report);
-		
+
+
         NRF_LOG_INFO("roll:" NRF_LOG_FLOAT_MARKER , NRF_LOG_FLOAT(roll));
         NRF_LOG_INFO("pitch:" NRF_LOG_FLOAT_MARKER , NRF_LOG_FLOAT(pitch));
         NRF_LOG_INFO("yaw:" NRF_LOG_FLOAT_MARKER "\r\n", NRF_LOG_FLOAT(yaw));
 		}
 }
-
-/*void MPU_task(void *parameters)
+#endif
+uint8_t MPU_Read_data(float *pitch,float* roll,float *yaw)
 {
-	float pitch;
-	float roll;
-	float yaw;
-		short aacx,aacy,aacz;		//加速度传感器原始数据
-	short gyrox,gyroy,gyroz;	//陀螺仪原始数据
-	short temp;	
-	uint8_t report=1;
-	uint32_t a;
-	while(1)
+	if(0==mpu_dmp_get_data(pitch,roll,yaw))
 		{
-			xSemaphoreTake(MPURdyDateSem,portMAX_DELAY);
-			if(0 == mpu_dmp_get_data(&pitch,&roll,&yaw))
-				{
-					temp = MPU_Get_Temperature();
-					MPU_Get_Accelerometer(&aacx,&aacy,&aacz);	//得到加速度传感器数据
-			MPU_Get_Gyroscope(&gyrox,&gyroy,&gyroz);	//得到陀螺仪数据
-		//	if(report)mpu6050_send_data(aacx,aacy,aacz,gyrox,gyroy,gyroz);//用自定义帧发送加速度和陀螺仪原始数据
-			//	vTaskDelay(200);
-			if(report)usart1_report_imu(aacx,aacy,aacz,gyrox,gyroy,gyroz,(int)(roll*100),(int)(pitch*100),(int)(yaw*10));
-		//app_uart_put(report);
-		    NRF_LOG_INFO("roll:" NRF_LOG_FLOAT_MARKER , NRF_LOG_FLOAT(roll));
-        NRF_LOG_INFO("pitch:" NRF_LOG_FLOAT_MARKER , NRF_LOG_FLOAT(pitch));
-        NRF_LOG_INFO("yaw:" NRF_LOG_FLOAT_MARKER "\r\n", NRF_LOG_FLOAT(yaw));
-
-			}
+         NRF_LOG_INFO("roll:" NRF_LOG_FLOAT_MARKER , NRF_LOG_FLOAT(*roll));
+       NRF_LOG_INFO("pitch:" NRF_LOG_FLOAT_MARKER , NRF_LOG_FLOAT(*pitch));
+        NRF_LOG_INFO("yaw:" NRF_LOG_FLOAT_MARKER "\r\n", NRF_LOG_FLOAT(*yaw));
+			return 0;
 		}
+	else
+		return 1;
 }
-*/
+
+
 

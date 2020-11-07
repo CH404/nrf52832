@@ -25,7 +25,7 @@ void service_init(void)
    err_code = nrf_ble_qwr_init(&m_qwr, &qwr_init);
 
    G_CHECK_ERROR_CODE_INFO(err_code);
-  // service_date_init();
+ //  service_date_init();
 
 }
 
@@ -37,7 +37,6 @@ void service_init(void)
 void service_date_init(void)
 {
 	ret_code_t err_code;
-	RTC2_init(NULL);
 	err_code = ble_date_init();
 	G_CHECK_ERROR_CODE_INFO(err_code);
 }

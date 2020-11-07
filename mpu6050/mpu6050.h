@@ -92,7 +92,9 @@
 
 
 //MPU6050_ETX float_t pitch[5];
-
+#define PITCH_ENABLE
+#define ROLL_ENABLE
+#define YAW_ENABLE
 
 
 MPU6050_ETX uint8_t MPU_Read_Length(uint8_t address,uint8_t reg,uint8_t length,uint8_t *buff);

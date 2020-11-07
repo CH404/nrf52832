@@ -1,0 +1,12 @@
+---- vApplicationStackOverflowHook Matches (11 in 5 files) ----
+app_freertos.c (app) line 303 : void vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)
+app_freertos.h (app) line 79 : void vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName);
+StackMacros.h (external\freertos\source\include) line 60 : 			vApplicationStackOverflowHook( ( TaskHandle_t ) pxCurrentTCB, pxCurrentTCB->pcTaskName );	\
+StackMacros.h (external\freertos\source\include) line 76 : 			vApplicationStackOverflowHook( ( TaskHandle_t ) pxCurrentTCB, pxCurrentTCB->pcTaskName );	\
+StackMacros.h (external\freertos\source\include) line 95 : 			vApplicationStackOverflowHook( ( TaskHandle_t ) pxCurrentTCB, pxCurrentTCB->pcTaskName );	\
+StackMacros.h (external\freertos\source\include) line 119 : 			vApplicationStackOverflowHook( ( TaskHandle_t ) pxCurrentTCB, pxCurrentTCB->pcTaskName );									\
+stack_macros.h (external\freertos\source\include) line 56 : 			vApplicationStackOverflowHook( ( TaskHandle_t ) pxCurrentTCB, pxCurrentTCB->pcTaskName );	\
+stack_macros.h (external\freertos\source\include) line 72 : 			vApplicationStackOverflowHook( ( TaskHandle_t ) pxCurrentTCB, pxCurrentTCB->pcTaskName );	\
+stack_macros.h (external\freertos\source\include) line 91 : 			vApplicationStackOverflowHook( ( TaskHandle_t ) pxCurrentTCB, pxCurrentTCB->pcTaskName );	\
+stack_macros.h (external\freertos\source\include) line 115 : 			vApplicationStackOverflowHook( ( TaskHandle_t ) pxCurrentTCB, pxCurrentTCB->pcTaskName );									\
+tasks.c (external\freertos\source) line 407 : 	extern void vApplicationStackOverflowHook( TaskHandle_t xTask, char *pcTaskName );

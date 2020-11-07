@@ -57,7 +57,7 @@
 
 #define configUSE_PREEMPTION                                                      1
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION                                   0
-#define configUSE_TICKLESS_IDLE                                                  	1
+#define configUSE_TICKLESS_IDLE                                                   1
 #define configUSE_TICKLESS_IDLE_SIMPLE_DEBUG                                      1 /* See into vPortSuppressTicksAndSleep source code for explanation */
 #define configCPU_CLOCK_HZ                                                        ( SystemCoreClock )  //使用RTC 时钟频率是32768HZ
 #define configTICK_RATE_HZ                                                        1024		//换算1024 即为tick 的频率,1024Hz，1s 1024个tick 差不多0.976ms 一个tick
@@ -80,7 +80,7 @@
 /* Hook function related definitions. */
 #define configUSE_IDLE_HOOK                                                       1
 #define configUSE_TICK_HOOK                                                       0
-#define configCHECK_FOR_STACK_OVERFLOW                                            0
+#define configCHECK_FOR_STACK_OVERFLOW                                            2
 #define configUSE_MALLOC_FAILED_HOOK                                              0
 
 /* Run time and task stats gathering related definitions. */

@@ -1,8 +1,6 @@
 #define RTC_GLOBAL
 #include "rtc.h"
 #include "global.h"
-//#include "ble_srv_common.h"
-//#include "ble_conn_state.h"
 #include "nrf_delay.h"
 
 uint8_t month_table[12]={31,29,31,30,31,30,31,31,30,31,30,31};
@@ -15,7 +13,6 @@ real_time_t time_base = {
     .second = 0,
     .week =   0,
 };
-
 
 
 static uint32_t real_time = 0;
@@ -40,10 +37,18 @@ static void rtc2_handler(nrfx_rtc_int_type_t evt_type)
 		real_time++;
     nrfx_rtc_counter_clear(&rtc2);
 		nrfx_rtc_cc_set(&rtc2,0, 8,true);
-		xSemaphoreGiveFromISR(RTCUpdateSem, &pxHigherPriorityTaskWoken);
-		portYIELD_FROM_ISR(pxHigherPriorityTaskWoken);
-  //  xTaskResumeFromISR(RTCUpdateTaskHandle);
-	//	NRF_LOG_INFO("NRFX_RTC_INT_COMPARE0");
+                //使用任务通知      
+                NRF_LOG_INFO("NRFX_RTC_1S");
+
+//再添加一个uint8_t 变量计时亮屏时间，有触摸则清0,临界资源,要加锁
+
+
+								
+#if USE_RTC_DATE_TASK
+    vTaskNotifyGiveFromISR(RTCUpdateTaskHandle,&pxHigherPriorityTaskWoken);
+	//	  xSemaphoreGiveFromISR(RTCUpdateSem, &pxHigherPriorityTaskWoken);
+	portYIELD_FROM_ISR(pxHigherPriorityTaskWoken);
+#endif
 		break;
 	}
 }
@@ -63,11 +68,16 @@ void RTC2_init(nrfx_rtc_handler_t handler)
 		handler = rtc2_handler;
 	ret_code_t err_code = nrfx_rtc_init(&rtc2,&config,handler);
 	G_CHECK_ERROR_CODE_INFO(err_code);
-	nrfx_rtc_enable(&rtc2);
+	//nrfx_rtc_enable(&rtc2);
   //  nrfx_rtc_tick_enable(&rtc2,true);  //使能rtc2 和 tick event
    err_code =  nrfx_rtc_cc_set(&rtc2,0,8,true);
 	 G_CHECK_ERROR_CODE_INFO(err_code);
 	// RTC_semaphore_init(); 	 		
+}
+
+void RTC2_enable(void)
+{
+	nrfx_rtc_enable(&rtc2);
 }
 
 /************************************************
@@ -76,8 +86,9 @@ void RTC2_init(nrfx_rtc_handler_t handler)
 参数:
 返回值:
 **************************************************/
-void data_convert(real_time_t data,uint8_t * buff)
+void data_convert(real_time_t data,char * datebuff,char* timebuff)
 {
+#if 0
         uint8_t yearH,yearL;
         yearH = (uint8_t)(data.year / 100);
         yearL = (uint8_t)(data.year % 100);
@@ -90,6 +101,12 @@ void data_convert(real_time_t data,uint8_t * buff)
 	buff[5] = data.minute;
 	buff[6] = data.second;
 	buff[7] = data.week;	
+#endif
+#if 1
+	sprintf(datebuff,"%d.%d%d.%d%d",data.year,data.month/10,data.month%10,data.day/10,data.day&10);
+	sprintf(timebuff,"%d%d:%d%d",data.hours/10,data.hours%10,data.minute/10,data.minute%10);
+#endif
+
 }
 
 /************************************************
@@ -174,9 +191,10 @@ void update_date(void)
 	 uint32_t days_elapsed = 0U;
 	 uint16_t a_yes_days = 366U;
 	 uint16_t year_tmp = time_base.year;
-	 current_time.minute = (uint8_t)((real_time/60)%60);
-	 current_time.second = (uint8_t)(real_time%60U);
-	 hours_tmp = (real_time / 3600U);
+	 uint32_t tmp_real_time = real_time;
+	 current_time.minute = (uint8_t)((tmp_real_time/60)%60);
+	 current_time.second = (uint8_t)(tmp_real_time%60U);
+	 hours_tmp = (tmp_real_time / 3600U);
 	
 	 if(hours_tmp >= 24)
 	 {
@@ -195,7 +213,7 @@ void update_date(void)
 							 a_yes_days =366;
 							 month_table[1] = 29;
 							 time_base.year = year_tmp;
-							 real_time -= ((real_time / 3600U)/24 - days_elapsed)*24U*3600U;
+							 real_time -= ((tmp_real_time / 3600U)/24 - days_elapsed)*24U*3600U;    //real_time 中rtc2中断里也被使用，属于临界资源，要加锁
 					 }
 					 else
 					 {

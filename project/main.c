@@ -10,17 +10,17 @@
 #include "inv_mpu_dmp_motion_driver.h" 
 #include "spi.h"
 #include "st7789.h"
-#include "bmp.h"
+//#include "bmp.h"
 //#include "it725x.h"
-APP_TIMER_DEF(led_timer);	
+//APP_TIMER_DEF(led_timer);	
 NRF_BLE_GATT_DEF(m_gatt);//定义gatt模块实例
 
 
-
+#if 0
 #define STATIC_PASSKEY "890731"
 static ble_opt_t static_option;
 ble_gap_sec_params_t sec_params;
-
+#endif
 #if NRF_LOG_ENABLED && USE_FREERTOS
 static TaskHandle_t m_logger_thread;
 
@@ -102,7 +102,7 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt,void *context)
 			
 			NRF_LOG_INFO("Connected");
 			m_conn_handle=p_ble_evt->evt.common_evt.conn_handle;
-			err_code = sd_ble_gap_authenticate(m_conn_handle,&sec_params);
+		//	err_code = sd_ble_gap_authenticate(m_conn_handle,&sec_params);
 			G_CHECK_ERROR_CODE_INFO(err_code);
 			// hrs_timer_start();
 			break;
@@ -199,7 +199,7 @@ static void ble_stack_init(void)
 static void gap_params_init(void)
 {
 	ret_code_t err_code;
-	uint8_t passkey[] = STATIC_PASSKEY;
+   //     uint8_t passkey[] = STATIC_PASSKEY;
 	
 	ble_gap_conn_params_t gap_conn_params;	//连接参数
 	ble_gap_conn_sec_mode_t sec_mode;	//连接安全模式
@@ -523,7 +523,7 @@ static void peer_manager_init(void)
 		err_code = pm_peers_delete();
 		G_CHECK_ERROR_CODE_INFO(err_code);
 	}
-    memset(&sec_params, 0, sizeof(ble_gap_sec_params_t));
+   /* memset(&sec_params, 0, sizeof(ble_gap_sec_params_t));
 	
 	//Bonding just works 
 	sec_params.bond = SEC_PARAM_BOND;                //绑定
@@ -547,7 +547,7 @@ static void peer_manager_init(void)
 	G_CHECK_ERROR_CODE_INFO(err_code);
    
     err_code = pm_register(pm_evt_handler);
-    G_CHECK_ERROR_CODE_INFO(err_code);
+    G_CHECK_ERROR_CODE_INFO(err_code);*/
 
 }
 /*****************************************************
@@ -669,8 +669,7 @@ void HardFault_Handler(void)
 }
 void PreSleepProcessing(uint32_t ulExpectedIdleTime)
 {
-   
-
+   NRF_LOG_INFO("PreSleepProcessing");
 }
 void PostSleepProcessing(uint32_t ulExpectedIdleTime)
 {
@@ -681,6 +680,20 @@ void MotorPinInit(void)
 {
 	nrf_gpio_cfg(16,NRF_GPIO_PIN_DIR_OUTPUT,NRF_GPIO_PIN_INPUT_DISCONNECT,NRF_GPIO_PIN_PULLDOWN,NRF_GPIO_PIN_S0S1,NRF_GPIO_PIN_NOSENSE);
 }
+
+void stack_overflow_cat(void *param)
+{
+ 
+    for(;;)
+    {
+       NRF_LOG_INFO("stack:%d\n",(int)uxTaskGetStackHighWaterMark(startTaskHandle));
+        NRF_LOG_INFO("rtcstack:%d\n",(int)uxTaskGetStackHighWaterMark(RTCUpdateTaskHandle));
+           NRF_LOG_INFO("lcdstack:%d\n",(int)uxTaskGetStackHighWaterMark(lcdRefreshHandle));
+        vTaskDelay(1000);
+    }
+    vTaskDelete( NULL );
+}
+
 #define SCREEN_LCD_LED_PIN	15
 
  int main(void)
@@ -703,6 +716,8 @@ void MotorPinInit(void)
 	conn_params_init();
 	peer_manager_init();
 #endif
+RTC2_init(NULL);        //初始化，但不启动，有rtc任务启动
+
 // CommonWatchDogInit();	//watchdog init
 // TwiDriverInit(MPU6050);//hardware iic init
 // I2cSimulationInit();   //software iic init
@@ -720,7 +735,7 @@ void MotorPinInit(void)
 //nrf_delay_ms(50);
 //}
 //SPI_WriteData(0x88);
-ST7789_Init();
+//ST7789_Init();
 //	LCD_Init();
 //	SPI_SoftWareInit();
 //nrf_delay_ms(2000);	
@@ -729,26 +744,32 @@ ST7789_Init();
 //ST7789_Init();
 // ST7789_Fill_Color(WHITE);
 
-ST7789_PictureDraw(gImage_bmp,sizeof(gImage_bmp));
+//ST7789_PictureDraw(gImage_bmp,sizeof(gImage_bmp));
+       SAADC_Init();    
+        
+LCD_Init();
 
-//test1();
 //IT725X_Init();
 
-while(1);
 
-
-	/*MPU_Init();						//mpu6050 module init
+	MPU_Init();						//mpu6050 module init
 	 while( a = mpu_dmp_init())
 		{
         NRF_LOG_INFO("mpu_dmp_init error:%d",a);
 		}
-*/
-/*	mpu6050 interrupt configure 有bug
-	MPU_INT_Init();
-  MPU_Pin_int();
-  */
+         
+     /*    while(1)
+         {
+         MPU_Read_data();
+         nrf_delay_ms(100);
+         }*/
 
-#if 1
+//	mpu6050 interrupt configure 有bug
+	MPU_INT_Init();
+//  MPU_Pin_int();
+  //sstest();
+
+#if 0
 
 #endif
 
@@ -760,6 +781,10 @@ advertisingButton = CLOSE;
 
 #if USE_FREERTOS 
 #if USE_TASK
+
+
+// if(xTaskCreate(stack_overflow_cat, "stack_overflow_cat", 512, NULL,2, NULL) != pdPASS){		 }
+
  task_init();
 #endif
 

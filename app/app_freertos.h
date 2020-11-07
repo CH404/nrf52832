@@ -2,7 +2,8 @@
 #define __APP_FREE_H
 #include "FreeRTOS.h"
 #include "semphr.h"
-#include "event_groups.h"
+#include "event_groups.h"
+
 #include "timers.h"
 
 #ifdef APP_FREE_GLOBAL
@@ -12,14 +13,12 @@
 #endif
 
 //mpu6050 定时器handle
-APP_FREE_EXT TimerHandle_t MPU_TIMER;
-//rtc 中断信号量
-#define RTCUpdateSemMaxCount 1
-#define RTCUpdateSemInitCount 0
+APP_FREE_EXT TimerHandle_t mpu_timer;
+APP_FREE_EXT TimerHandle_t battery_timer;
 
 //rtc task
-#define RTC_UPDATE_TASK_SIZE 50
-#define RTC_UPDATE_TASK_PRIO 2
+#define RTC_UPDATE_TASK_SIZE 200	//使用uxTaskGetStackHighWaterMark 测得最小剩余8，几秒中内而已
+#define RTC_UPDATE_TASK_PRIO 3
 APP_FREE_EXT TaskHandle_t RTCUpdateTaskHandle;
 void RTCUpdateTaskHandler(void *pvParamenters);
 
@@ -32,6 +31,13 @@ void WdtFeedTask (void *paramenters);
 // watch dog eventGroup handle
 APP_FREE_EXT EventGroupHandle_t wdtFeedEventHandle;
 
+#define LCD_REFRESH_TASK_SIZE 200
+#define LCD_REFRESH_TASK_PRIO	2
+
+APP_FREE_EXT TaskHandle_t lcdRefreshHandle;
+void LcdRefreshTaskHandler(void* paramenters);
+
+
 
 //rtc task eventGroup set bit
 #define RTC_UPDATE_EVENT_BIT 0x01
@@ -43,11 +49,23 @@ APP_FREE_EXT EventGroupHandle_t wdtFeedEventHandle;
 #define NRF_SDH_FREERTOS_SOFTDERVICE_TASK_PRIO 4
 
 //start task 
-#define START_TASK_SIZE 50
-#define START_TASK_PRIO  0
+#define START_TASK_SIZE 200
+#define START_TASK_PRIO  1
 APP_FREE_EXT TaskHandle_t startTaskHandle;
 void StartTask(void* pvParameters);
 
+
+
+//任务通知
+#define ESP_TO_LCD_NOTIFY_BIT 0xFFFFFFF1
+#define RTC_TO_LCD_NOTIFY_BIT 0xFFFFFFF2
+#define IT725_TO_LCD_NOTIFY_BIT 0xFFFFFFF4
+#define MPU6050_TO_LCD_NOTIFY_BIT 0xFFFFFFF8
+
+#define RTC_TO_DOG_NOTIFY_BIT	0x01
+#define MPU6050_TO_DOG_NOTIFY_BIT 0x02
+
+#define FEED_DOG_ENABLE_BIT 0x03
 
 
 APP_FREE_EXT void os_timer_init(void);
@@ -56,6 +74,7 @@ APP_FREE_EXT bool task_init(void);
 
 
 
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName);
 
 
 

@@ -59,8 +59,8 @@
 //    return msp430_reg_int_cb(int_param->cb, int_param->pin, int_param->lp_exit,
 //        int_param->active_low);
 //}
-#define log_i 	printf	//打印信息
-#define log_e  	printf	//打印信息
+//#define log_i 	printf	//打印信息
+//#define log_e  	printf	//打印信息
 /* labs is already defined by TI's toolchain. */
 /* fabs is for doubles. fabsf is for floats. */
 #define fabs        fabsf
@@ -448,49 +448,6 @@ enum lp_accel_rate_e {
 #endif
 
 #if defined MPU6050
-//const struct gyro_reg_s reg = {
-//    .who_am_i       = 0x75,
-//    .rate_div       = 0x19,
-//    .lpf            = 0x1A,
-//    .prod_id        = 0x0C,
-//    .user_ctrl      = 0x6A,
-//    .fifo_en        = 0x23,
-//    .gyro_cfg       = 0x1B,
-//    .accel_cfg      = 0x1C,
-//    .motion_thr     = 0x1F,
-//    .motion_dur     = 0x20,
-//    .fifo_count_h   = 0x72,
-//    .fifo_r_w       = 0x74,
-//    .raw_gyro       = 0x43,
-//    .raw_accel      = 0x3B,
-//    .temp           = 0x41,
-//    .int_enable     = 0x38,
-//    .dmp_int_status = 0x39,
-//    .int_status     = 0x3A,
-//    .pwr_mgmt_1     = 0x6B,
-//    .pwr_mgmt_2     = 0x6C,
-//    .int_pin_cfg    = 0x37,
-//    .mem_r_w        = 0x6F,
-//    .accel_offs     = 0x06,
-//    .i2c_mst        = 0x24,
-//    .bank_sel       = 0x6D,
-//    .mem_start_addr = 0x6E,
-//    .prgm_start_h   = 0x70
-//#ifdef AK89xx_SECONDARY
-//    ,.raw_compass   = 0x49,
-//    .yg_offs_tc     = 0x01,
-//    .s0_addr        = 0x25,
-//    .s0_reg         = 0x26,
-//    .s0_ctrl        = 0x27,
-//    .s1_addr        = 0x28,
-//    .s1_reg         = 0x29,
-//    .s1_ctrl        = 0x2A,
-//    .s4_ctrl        = 0x34,
-//    .s0_do          = 0x63,
-//    .s1_do          = 0x64,
-//    .i2c_delay_ctrl = 0x67
-//#endif
-//};
 const struct gyro_reg_s reg = {
 0x75,  //who_am_i
 0x19,  //rate_div
@@ -520,18 +477,6 @@ const struct gyro_reg_s reg = {
 0x6E,  // mem_start_addr
 0x70   // prgm_start_h
 };
-
-//const struct hw_s hw = {
-//    .addr           = 0x68,
-//    .max_fifo       = 1024,
-//    .num_reg        = 118,
-//    .temp_sens      = 340,
-//    .temp_offset    = -521,
-//    .bank_size      = 256
-//#if defined AK89xx_SECONDARY
-//    ,.compass_fsr    = AK89xx_FSR
-//#endif
-//};
 const struct hw_s hw={
   0x68,	 //addr
   1024,	 //max_fifo
@@ -540,23 +485,6 @@ const struct hw_s hw={
   -521,	 //temp_offset
   256	 //bank_size
 };
-
-//const struct test_s test = {
-//    .gyro_sens      = 32768/250,
-//    .accel_sens     = 32768/16,
-//    .reg_rate_div   = 0,    /* 1kHz. */
-//    .reg_lpf        = 1,    /* 188Hz. */
-//    .reg_gyro_fsr   = 0,    /* 250dps. */
-//    .reg_accel_fsr  = 0x18, /* 16g. */
-//    .wait_ms        = 50,
-//    .packet_thresh  = 5,    /* 5% */
-//    .min_dps        = 10.f,
-//    .max_dps        = 105.f,
-//    .max_gyro_var   = 0.14f,
-//    .min_g          = 0.3f,
-//    .max_g          = 0.95f,
-//    .max_accel_var  = 0.14f
-//};
 const struct test_s test={
 32768/250,		 //gyro_sens
 32768/16,		 //	accel_sens
@@ -573,20 +501,20 @@ const struct test_s test={
 0.95f,		   //	max_g
 0.14f		   //	max_accel_var
 };
-
-//static struct gyro_state_s st = {
-//    .reg = &reg,
-//    .hw = &hw,
-//    .test = &test
-//};
+/*
+#pragma location = 0x3E000
+__root static struct gyro_state_s st={
+  &reg,
+  &hw,
+  {0},
+  &test
+};*/
 static struct gyro_state_s st={
   &reg,
   &hw,
   {0},
   &test
 };
-
-
 #elif defined MPU6500
 const struct gyro_reg_s reg = {
     .who_am_i       = 0x75,
@@ -788,7 +716,7 @@ int mpu_init(void)
         else if (rev == 2)
             st.chip_cfg.accel_half = 0;
         else {
-            log_e("Unsupported software product rev %d.\n", rev);
+          //  log_e("Unsupported software product rev %d.\n", rev);
             return -1;
         }
     } else {
@@ -796,11 +724,11 @@ int mpu_init(void)
             return -1;
         rev = data[0] & 0x0F;
         if (!rev) {
-            log_e("Product ID read as 0 indicates device is either "
-                "incompatible or an MPU3050.\n");
+          //  log_e("Product ID read as 0 indicates device is either "
+           //     "incompatible or an MPU3050.\n");
             return -1;
         } else if (rev == 4) {
-            log_i("Half sensitivity part found.\n");
+          //  log_i("Half sensitivity part found.\n");
             st.chip_cfg.accel_half = 1;
         } else
             st.chip_cfg.accel_half = 0;
@@ -3014,9 +2942,15 @@ uint8_t mpu_dmp_get_data(float *pitch,float *roll,float *yaw)
 		q2 = quat[2] / q30;
 		q3 = quat[3] / q30; 
 		//计算得到俯仰角/横滚角/航向角
+	#ifdef PITCH_ENABLE
 		*pitch = asin(-2 * q1 * q3 + 2 * q0* q2)* 57.3;	// pitch
+	#endif
+	#ifdef ROLL_ENABLE
 		*roll  = atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2* q2 + 1)* 57.3;	// roll
+	#endif
+	#ifdef YAW_ENABLE
 		*yaw   = atan2(2*(q1*q2 + q0*q3),q0*q0+q1*q1-q2*q2-q3*q3) * 57.3;	//yaw
+	#endif
 	}else return 2;
 	return 0;
 }

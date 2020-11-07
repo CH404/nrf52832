@@ -1,7 +1,7 @@
 #ifndef __ADVERTISING_H
 #define __ADVERTISING_H
 
-#ifndef ADVERTISING_GLOBAL
+#ifdef ADVERTISING_GLOBAL
 #define ADVERTISING_EXT
 #else
 #define ADVERTISING_EXT extern
@@ -23,6 +23,9 @@ OPEN
 }advertisingButtonState;
 
 static void on_adv_evt(ble_adv_evt_t ble_adv_evt);
+
+//extern FontDef Font_16x26;
+//extern FontDef Font_7x10;
 
 ADVERTISING_EXT void advertising_code_init(void);		
 ADVERTISING_EXT void advertising_init(void);

@@ -14,17 +14,17 @@
 #define IT725X_ReadLength
 
 #define PI 3.14
-#define MAX_ANGLE_DOWN 10
-#define MIN_ANGLE_DOWN  -10
+#define MAX_ANGLE_DOWN 30
+#define MIN_ANGLE_DOWN  -30
 
-#define MAX_ANGLE_UP	170
-#define MIN_ANGLE_UP  -170
+#define MAX_ANGLE_UP	150
+#define MIN_ANGLE_UP  -150
 
-#define MAX_ANGLE_LEFT	-80
-#define MIN_ANGLE_LEFT  -100
+#define MAX_ANGLE_LEFT	-60
+#define MIN_ANGLE_LEFT  -120
 
-#define MAX_ANGLE_RIGHT 100
-#define MIN_ANGLE_RIGHT 80
+#define MAX_ANGLE_RIGHT 120
+#define MIN_ANGLE_RIGHT 60
 
 
 #define IT725X_Reset_Pin 7
@@ -37,7 +37,7 @@
 #define TWI0_SCL_PIN IT725X_SCL_PiN
 #define IT725X_ADDRESS 0x46
 
-static ScreenEvent_t handle;
+ScreenEvent_t handle;
 
 #if 1
 static void IT725X_handler(nrfx_gpiote_pin_t pin,nrf_gpiote_polarity_t action)
@@ -45,6 +45,7 @@ static void IT725X_handler(nrfx_gpiote_pin_t pin,nrf_gpiote_polarity_t action)
 	  ret_code_t err_code;
   uint8_t buffer_type=0x80;
   uint8_t rx_buff[2] = {0x00};
+	BaseType_t HigherPriorityTaskWoken;
 
 	if(pin != IT725X_Int_Pin)
         {
@@ -59,7 +60,13 @@ static void IT725X_handler(nrfx_gpiote_pin_t pin,nrf_gpiote_polarity_t action)
       {
               if(rx_buff[0]&0x80)	//new packet
                       {
-                         IT725X_GenerateEvent(&handle);     
+                         if(IT725X_GenerateEvent(&handle))
+                         	{
+												 #if USE_LCD_TASK
+												 xTaskNotifyFromISR(lcdRefreshHandle,IT725_TO_LCD_NOTIFY_BIT, eSetBits, &HigherPriorityTaskWoken);
+												 portYIELD_FROM_ISR(HigherPriorityTaskWoken);
+												 #endif
+                         	}
                       }
               else if((rx_buff[0]&0x40))
                       {
@@ -274,16 +281,16 @@ bool IT725X_GetTwoPoint(ScreenEvent_t *point)
 	return false;
 }
 
-void IT725X_GenerateEvent(ScreenEvent_t *point)
+bool IT725X_GenerateEvent(ScreenEvent_t *point)
 {
 	if(!IT725X_GetTwoPoint(point))
-		return;
+		return false;
 	if(point->start.x == point->end.x || point->start.y == point->end.y)
 		{
 			point->evt = tap;
 			point->dir = not;
 		NRF_LOG_INFO("%d,%d",point->dir,point->evt);
-			return;
+			return true;
 		}
 	double_t angle;
 #if 0
@@ -301,7 +308,7 @@ void IT725X_GenerateEvent(ScreenEvent_t *point)
 		point->dir = down;
 	else if(MIN_ANGLE_RIGHT<angle && MAX_ANGLE_RIGHT >angle)
 		point->dir = right;
-	else if(MIN_ANGLE_UP>angle && MAX_ANGLE_UP <angle)
+	else if((MIN_ANGLE_UP>angle && angle < -180)|| (angle>MAX_ANGLE_UP && angle <180))
 		point->dir = up;
 	else
 		point->dir = not;
@@ -310,6 +317,7 @@ void IT725X_GenerateEvent(ScreenEvent_t *point)
 	
 	NRF_LOG_INFO("%d,%d",point->dir,point->evt);
 	NRF_LOG_INFO("angle:" NRF_LOG_FLOAT_MARKER , NRF_LOG_FLOAT(angle));
+        return true;
 	
 	
 }

@@ -1,7 +1,7 @@
 #ifndef __ST7789_H
 #define __ST7789_H
 #include <stdint.h>
-
+#include "bmp.h"
 /**
  * Comment one to use another one.
  * two parameters can be choosed
@@ -116,7 +116,10 @@ void LCD_Init(void);
 void BlockWrite(unsigned int Xstart,unsigned int Xend,unsigned int Ystart,unsigned int Yend);
 void ST7789_command_list(void);
 void ST7789_DrawPixel(uint16_t x, uint16_t y, uint16_t color);
-void ST7789_PictureDraw(const uint8_t *pic,uint32_t size);
+void ST7789_PictureDraw(uint16_t x, uint16_t y,const uint8_t *pic,uint32_t size);
+void ST7789_WriteChar(uint16_t x, uint16_t y, char ch, FontDef font, uint16_t color, uint16_t bgcolor);
+void ST7789_WriteString(uint16_t x, uint16_t y, const char *str, FontDef font, uint16_t color, uint16_t bgcolor);
+void ST7789_DrawCircle(uint16_t x0, uint16_t y0, uint8_t r, uint16_t color);
 
 
 

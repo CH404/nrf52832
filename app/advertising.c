@@ -1,8 +1,8 @@
 #define ADVERTISING_GLOBAL
 #include "global.h"
 #include "ble_advdata.h"
-//#include "ble_hrs.h"
-#include "ble_advertising.h"
+#include "ble_hrs.h"
+//#include "ble_advertising.h"
 #include "ble_conn_state.h"
 BLE_ADVERTISING_DEF(m_advertising);
 

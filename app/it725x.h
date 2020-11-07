@@ -8,6 +8,7 @@
 #endif
 
 #include "stdint.h" 
+#include <stdbool.h>
 typedef struct
 {
 	uint8_t address;
@@ -54,15 +55,17 @@ typedef struct
 	uint8_t evt;
 }ScreenEvent_t;
 
+IT725X_EXT ScreenEvent_t handle;
+
+
 IT725X_EXT void IT725X_Init(void);
 IT725X_EXT void IT725X_GetBuffData(uint8_t buffer_type,uint8_t*receive,uint8_t len);
 IT725X_EXT void IT725X_GetCommand(uint8_t *commandAndData,uint8_t length,uint8_t*receive,uint8_t len);
 IT725X_EXT uint16_t IT725X_SetCommand(uint8_t *commandAndData,uint8_t length);
 IT725X_EXT void IT725X_InterruptInit(void);
 IT725X_EXT void IT725X_HardwareInit(void);
-void IT725X_GenerateEvent(ScreenEvent_t *point);
-
-
+//void IT725X_GenerateEvent(ScreenEvent_t *point);
+bool IT725X_GenerateEvent(ScreenEvent_t *point);
 void IT725X_GetCommand(uint8_t *commandAndData,uint8_t length,uint8_t*receive,uint8_t len);
 #endif 
 
