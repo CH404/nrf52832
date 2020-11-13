@@ -4,6 +4,22 @@
 //#include "st7789.h"
 //#include "it725x.h"
 
+
+#define LCD_BATTERY_LEVEL1	1
+#define LCD_BATTERY_LEVEL2  2
+#define LCD_BATTERY_LEVEL3	3
+#define LCD_BATTERY_LEVEL0	0
+
+#define LCD_BATTERT_ONE_LEVEL_WIDTH 4
+
+
+
+#define LCD_ICON_BATTERY_POS_X 60
+#define LCD_ICON_BATTERY_POS_Y 30
+#define LCD_ICON_BATTERY_WIDTH 15
+#define LCD_ICON_BATTERY_HIGHT 6
+
+
 #define LCD_ICON_FONT_POS_X 35
 #define LCD_ICON_FONT_POS_Y 35
 
@@ -131,6 +147,50 @@ void LCD_RefreshPage(char *datebuff,char *timebuff,uint8_t ui_page)
 			
 		}
 }
+
+/************************************************
+*说明:lcd屏画电量
+*函数名: void lcd_RefreshBattery(void)
+*参数:
+*返回值:
+************************************************/
+void LCD_RefreshBattery(uint8_t level)
+{
+	uint16_t x,color;
+	ST7789_Fill(LCD_ICON_BATTERY_POS_X,LCD_ICON_BATTERY_POS_Y,LCD_ICON_BATTERY_POS_X+LCD_ICON_BATTERY_WIDTH,LCD_ICON_BATTERY_POS_Y+LCD_ICON_BATTERY_HIGHT,BLACK);
+	ST7789_DrawRectangle(LCD_ICON_BATTERY_POS_X,LCD_ICON_BATTERY_POS_Y,\
+		LCD_ICON_BATTERY_POS_X+LCD_ICON_BATTERY_WIDTH,									\
+		LCD_ICON_BATTERY_POS_Y+LCD_ICON_BATTERY_HIGHT,									\
+		WHITE);
+	ST7789_Fill(LCD_ICON_BATTERY_POS_X-3,LCD_ICON_BATTERY_POS_Y+2,LCD_ICON_BATTERY_POS_X-2,LCD_ICON_BATTERY_POS_Y+4,WHITE);
+
+		
+		switch(level)
+		{
+
+			case LCD_BATTERY_LEVEL0:
+			case LCD_BATTERY_LEVEL1:
+				color = GREEN;
+			break;
+			case LCD_BATTERY_LEVEL2:
+					
+				color = YELLOW;
+			break;
+			case LCD_BATTERY_LEVEL3:
+					color = RED;
+			break;
+					color = WHITE;
+			default:
+			break;			
+		}
+		x = LCD_ICON_BATTERY_POS_X+1+(LCD_BATTERT_ONE_LEVEL_WIDTH*level);
+ST7789_Fill(x,LCD_ICON_BATTERY_POS_Y+1,\
+		LCD_ICON_BATTERY_POS_X+LCD_ICON_BATTERY_WIDTH-1,									\
+		LCD_ICON_BATTERY_POS_Y+LCD_ICON_BATTERY_HIGHT-1,									\
+		color);
+}
+
+
 
 
 /************************************************

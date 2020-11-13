@@ -10,9 +10,9 @@
 #include "rtc.h"
 #include "ble_date.h"
 
-uint8_t datebuff[10] = {0};
-uint8_t timebuff[6] = {0};
-
+static uint8_t datebuff[10] = {0};
+static uint8_t timebuff[6] = {0};
+#define BATTERY_SAADC_OFFSET 0.04
 #if 0
 #define DATE_TIMER_TICKS 1000
 #define DATE_TIMER_WAIT 2	//消息队列已满下，等待多少个tick
@@ -96,19 +96,30 @@ void LcdRefreshTaskHandler(void* paramenters)
 ***************************************************/
 void BatteryTimerBackCall(TimerHandle_t xTimer)
 {
-  
+
+	//获取上次检测的结果	
+	float battery_Value;
+//	static uint8_t i = 0;
+	uint8_t battery_level;
 #if (!SUE_BATTERY_INIT_DETECT)
   
 	uint16_t battery;
-        float SAADC_Value;
 	//检测电量
 	
 		SAADC_Start(0,&battery);	//阻塞
-      SAADC_Value = battery *7.2/1024;
-    NRF_LOG_INFO("voltage"NRF_LOG_FLOAT_MARKER "V",NRF_LOG_FLOAT(SAADC_Value));
+    battery_Value = battery *720/1024+BATTERY_SAADC_OFFSET*100;
+   
 #else
+		 // (电压 = adc_value x 3.6/1024) 	//因电池测电压 串联了两个电阻，用分压公式	U1= (R1/R1+R2) X U,R1=R2 = 100K
+		//故 (电压 = adc_value x 3.6/1024 x 2 ) 等于  电压 = adc_value x 7.2 /1024  7.2变成 72 整数运算比浮点运算快
+		 battery_Value = SAADC_Value*720/1024+BATTERY_SAADC_OFFSET*100; 
      SAADC_Start();	//启动电量检测，中断       
 #endif
+//	NRF_LOG_INFO("voltage"NRF_LOG_FLOAT_MARKER "V",NRF_LOG_FLOAT(battery_Value));
+		battery_level =(uint8_t)(420 - battery_Value)/30;
+		LCD_RefreshBattery(battery_level);
+		//
+
 }
 
 

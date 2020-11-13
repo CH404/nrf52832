@@ -750,12 +750,15 @@ RTC2_init(NULL);        //初始化，但不启动，有rtc任务启动
 LCD_Init();
 
 //IT725X_Init();
+ST7789_PictureDraw(120,120,gImage_disableble,sizeof(gImage_disableble));
+
+
 
 
 	MPU_Init();						//mpu6050 module init
 	 while( a = mpu_dmp_init())
 		{
-        NRF_LOG_INFO("mpu_dmp_init error:%d",a);
+        G_LOG_INFO("mpu_dmp_init error:%d",a);
 		}
          
      /*    while(1)
@@ -767,12 +770,6 @@ LCD_Init();
 //	mpu6050 interrupt configure 有bug
 	MPU_INT_Init();
 //  MPU_Pin_int();
-  //sstest();
-
-#if 0
-
-#endif
-
 
 NRF_LOG_INFO("mpu_dmp_init success");
 

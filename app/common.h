@@ -36,11 +36,13 @@ COMMON_EXT void CommonWatchDogInit(void);
 {												\
 	NRF_LOG_DEBUG("Function: %s error code: %s line: %d.",__func__,NRF_LOG_ERROR_STRING_GET(err_code),__LINE__);\
 }
+#define G_LOG_INFO NRF_LOG_INFO
 #else	//卡住等待看门狗复位
 #define G_CHECK_ERROR_CODE_INFO(err_code)    if(err_code != NRF_SUCCESS)\
 {                                                                        \
           while(1);                     \
 }
+#define G_LOG_INFO //
 #endif
 
 

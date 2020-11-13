@@ -139,9 +139,16 @@ if(err_code != SUCCESS_I2C)
 
 }
 
+/***************************************
+* 函数名:uint8_t MPU_Init(void)
+* 参数: 
+* 功能:配置mpu6050
+* 返回: success 0
+****************************************/
 uint8_t MPU_Init(void)
 {
-	uint8_t rx_data = 0;
+        
+	uint8_t cnt,rx_data = 0;
 	I2cSimulationInit();
 	I2c_Tx_OneByte(MPU_ADDR,MPU_PWR_MGMT1_REG,0x80);	////复位MPU6050
 	nrf_delay_ms(100);
@@ -163,6 +170,15 @@ uint8_t MPU_Init(void)
 				MPU_Set_Rate(50);	//设置采样率为50Hz
 		}else
 			return 1;
+		
+			while(mpu_dmp_init())
+			 {
+                           if(cnt++ > 5)
+                           {
+                              
+                           }
+			 }
+	
 		return 0;
 }
 
@@ -310,52 +326,7 @@ uint8_t MPU_Get_Accelerometer(short *ax,short *ay,short *az)
 	} 	
     return res;;
 }
-void uart_error_handle(app_uart_evt_t * p_event)
-{
-	if(p_event->evt_type == APP_UART_COMMUNICATION_ERROR)
-		{
-		//	NRF_LOG_INFO(APP_UART_COMMUNICATION_ERROR);
-		}
-	else if(p_event ->evt_type == APP_UART_FIFO_ERROR)
-		{
-	//	NRF_LOG_INFO(APP_UART_FIFO_ERROR);
-		}
-}
-#define RX_PIN_NUMBER 29
-#define TX_PIN_NUMBER	30
-#define RTS_PIN_NUMBER	7
-#define CTS_PIN_NUMBER	5
-#define UART_RX_BUF_SIZE	256
-#define UART_TX_BUF_SIZE	256
-#define BLE_UARTS_BUFF_MAX 25
-
-/**********************************************************
-函数名：void uart_init(void)	
-输入：
-输出：
-作用：初始化uarts 模块
-**********************************************************/
-void uart_init(void)
-{
-//	uart_RX_flage = false;
-	ret_code_t err_code;
-	app_uart_comm_params_t const comm_params = {
-		.rx_pin_no = RX_PIN_NUMBER,
-		.tx_pin_no = TX_PIN_NUMBER,
-		.rts_pin_no = RTS_PIN_NUMBER,
-		.cts_pin_no = CTS_PIN_NUMBER,
-		.flow_control = APP_UART_FLOW_CONTROL_DISABLED,
-		.use_parity = false,
-		.baud_rate = NRF_UART_BAUDRATE_115200
-	};
-	 APP_UART_FIFO_INIT(&comm_params,
-                       UART_RX_BUF_SIZE,
-                       UART_TX_BUF_SIZE,
-                       uart_error_handle,
-                       APP_IRQ_PRIORITY_LOWEST,
-                       err_code);
-}
-
+#if MPU6050_TEST
 
 //传送数据给匿名四轴上位机软件(V2.6版本)
 //fun:功能字. 0XA0~0XAF
@@ -427,7 +398,7 @@ void usart1_report_imu(short aacx,short aacy,short aacz,short gyrox,short gyroy,
 } 
 
 
-#if 0
+
 void MPU_Read(void)
 {
 //  uint8_t reg = 0;
@@ -456,6 +427,7 @@ void MPU_Read(void)
 		}
 }
 #endif
+
 uint8_t MPU_Read_data(float *pitch,float* roll,float *yaw)
 {
 	if(0==mpu_dmp_get_data(pitch,roll,yaw))

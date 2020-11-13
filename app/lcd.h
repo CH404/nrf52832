@@ -48,6 +48,7 @@ LCD_EXT void LCD_Refresh(char *datebuff,char *timebuff,uint8_t *UI_Page,bool rtc
 LCD_EXT void LCD_RefreshPage(char *datebuff,char *timebuff,uint8_t ui_page);
 
 //LCD_EXT uint8_t currentUIPage;
+LCD_EXT void LCD_RefreshBattery(uint8_t level);
 
 
 #endif

@@ -6,17 +6,23 @@
 #define OPEN_ADVERTISING 0
 #define ADD_SERVICE_TO_ADVERTISING 0
 #define USE_ADVERTISING_CODE_INIT 0
-#define SUE_BATTERY_INIT_DETECT 0
+#define SUE_BATTERY_INIT_DETECT 1
 
 #define USE_FREERTOS 1
 #define USE_TASK 1
+
+
+
 #if USE_TASK && USE_FREERTOS
 #define USE_RTC_DATE_TASK 0
 #define USE_MPU6050_TASK 0
 #define USE_WATCH_DOG_TASK 0
 #define USE_LCD_TASK 0
 #define USE_BATTERY_TASK 1
+#define USE_ESP_TASK 1
 #endif
+
+#define MPU6050_TEST 0
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -60,9 +66,9 @@
 
 //自定义ble服务
 #include "ble_date.h"
-
 #include "common.h"
 #include "rtc.h"
+#include "uart.h"
 #include "spi.h"
 #include "twi.h"
 #include "st7789.h"

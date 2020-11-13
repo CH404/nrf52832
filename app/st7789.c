@@ -3,6 +3,7 @@
 #include "spi.h"
 #include "nrf_gpio.h"
 //#include "bmp.h"
+#include <stdlib.h>
 
 #define ST7789_UnSelect SPI_CS_Release
 #define ST7789_Select SPI_CS_Select
@@ -21,10 +22,10 @@ uint8_t ST7789_TXBuffer[ST7789_MAX_TX_BUFF]={0};
 #endif
 
 /************************************************
-说明:software reset
-函数名:void ST7789_SoftwareReset(void)
-参数:
-返回值:
+*说明:software reset
+*函数名:void ST7789_SoftwareReset(void)
+*参数:
+*返回值:
 **************************************************/
 void ST7789_SoftwareReset(void)
 {
@@ -106,7 +107,117 @@ void ST7789_DrawPixel(uint16_t x, uint16_t y, uint16_t color)
 	uint8_t data[] = {color >> 8, color & 0xFF};
 	ST7789_Select();
 	ST7789_WriteDataLength(data,sizeof(data));
-	ST7789_UnSelect();
+//	ST7789_UnSelect();
+}
+
+/**
+ * @brief Fill an Area with single color
+ * @param xSta&ySta -> coordinate of the start point
+ * @param xEnd&yEnd -> coordinate of the end point
+ * @param color -> color to Fill with
+ * @return none
+ */
+void ST7789_Fill(uint16_t xSta, uint16_t ySta, uint16_t xEnd, uint16_t yEnd, uint16_t color)
+{
+	if ((xEnd < 0) || (xEnd >= ST7789_WIDTH) ||
+		 (yEnd < 0) || (yEnd >= ST7789_HEIGHT))	return;
+	ST7789_Select();
+	uint16_t i, j;
+	ST7789_SetAddressWindow(xSta, ySta, xEnd, yEnd);
+	for (i = ySta; i <= yEnd; i++)
+		for (j = xSta; j <= xEnd; j++) {
+			uint8_t data[] = {color >> 8, color & 0xFF};
+			ST7789_WriteDataLength(data, sizeof(data));
+		}
+//	ST7789_UnSelect();
+}
+
+/**
+ * @brief Draw a big Pixel at a point
+ * @param x&y -> coordinate of the point
+ * @param color -> color of the Pixel
+ * @return none
+ */
+void ST7789_DrawPixel_4px(uint16_t x, uint16_t y, uint16_t color)
+{
+	if ((x <= 0) || (x > ST7789_WIDTH) ||
+		 (y <= 0) || (y > ST7789_HEIGHT))	return;
+	ST7789_Select();
+	ST7789_Fill(x - 1, y - 1, x + 1, y + 1, color);
+	//ST7789_UnSelect();
+}
+
+/**
+ * @brief Draw a line with single color
+ * @param x1&y1 -> coordinate of the start point
+ * @param x2&y2 -> coordinate of the end point
+ * @param color -> color of the line to Draw
+ * @return none
+ */
+ #define ABS abs
+void ST7789_DrawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color) 
+{
+	uint16_t swap;
+    uint16_t steep = ABS(y1 - y0) > ABS(x1 - x0);
+    if (steep) {
+		swap = x0;
+		x0 = y0;
+		y0 = swap;
+
+		swap = x1;
+		x1 = y1;
+		y1 = swap;
+        //_swap_int16_t(x0, y0);
+        //_swap_int16_t(x1, y1);
+    }
+
+    if (x0 > x1) {
+		swap = x0;
+		x0 = x1;
+		x1 = swap;
+
+		swap = y0;
+		y0 = y1;
+		y1 = swap;
+        //_swap_int16_t(x0, x1);
+        //_swap_int16_t(y0, y1);
+    }
+
+    int16_t dx, dy;
+    dx = x1 - x0;
+    dy = ABS(y1 - y0);
+
+    int16_t err = dx / 2;
+    int16_t ystep;
+
+    if (y0 < y1) {
+        ystep = 1;
+    } else {
+        ystep = -1;
+    }
+
+    for (; x0<=x1; x0++) {
+        if (steep) {
+            ST7789_DrawPixel(y0, x0, color);
+        } else {
+            ST7789_DrawPixel(x0, y0, color);
+        }
+        err -= dy;
+        if (err < 0) {
+            y0 += ystep;
+            err += dx;
+        }
+    }
+}
+
+void ST7789_DrawRectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color)
+{
+	ST7789_Select();
+	ST7789_DrawLine(x1, y1, x2, y1, color);
+	ST7789_DrawLine(x1, y1, x1, y2, color);
+	ST7789_DrawLine(x1, y2, x2, y2, color);
+	ST7789_DrawLine(x2, y1, x2, y2, color);
+//	ST7789_UnSelect();
 }
 
 void ST7789_PictureDraw(uint16_t x, uint16_t y,const uint8_t *pic,uint32_t size)
@@ -148,8 +259,54 @@ void ST7789_WriteChar(uint16_t x, uint16_t y, char ch, FontDef font, uint16_t co
 	}
 //	ST7789_UnSelect();
 }
+/************************************************
+*说明: 画字符，只对应ASCII 32 - 126
+*函数名:ST7789_WriteStringAscii
+*参数:
+*返回值:
+**************************************************/
 
+#if 0																														//const在*左边，左数右指
+void ST7789_WriteStringAscii(uint16_t x, uint16_t y, const uint8_t *str,uint8_t size,FontDef font, uint16_t color, uint16_t bgcolor)
+{
+//	ST7789_Select();
+	uint8_t i, b, j;
+	while (*str) {
+		if (x + font.width >= ST7789_WIDTH) {
+			x = 0;
+			y += font.height;
+			if (y + font.height >= ST7789_HEIGHT) {
+				break;
+			}
 
+			if (*str == ' ') {
+				// skip spaces in the beginning of the new line
+				str++;
+				continue;
+			}
+		}
+//		ST7789_WriteChar(x, y, *str, font, color, bgcolor);
+		ST7789_SetAddressWindow(x, y, x + font.width - 1, y + font.height - 1);
+	
+			for (i = 0; i < font.height; i++) {
+				b = font.data[(*str+16) * font.height + i];
+				for (j = 0; j < font.width; j++) {
+					if ((b << j) & 0x8000) {
+						uint8_t data[] = {color >> 8, color & 0xFF};
+						 ST7789_WriteDataLength(data,sizeof(uint16_t));
+					}
+					else {
+						uint8_t data[] = {bgcolor >> 8, bgcolor & 0xFF};
+						ST7789_WriteDataLength(data,sizeof(uint16_t));
+					}
+				}
+			}
+		x += font.width;
+		str++;
+	}
+//	ST7789_UnSelect();
+}
+#endif
 void ST7789_WriteString(uint16_t x, uint16_t y, const char *str, FontDef font, uint16_t color, uint16_t bgcolor)
 {
 	ST7789_Select();
@@ -173,6 +330,11 @@ void ST7789_WriteString(uint16_t x, uint16_t y, const char *str, FontDef font, u
 	}
 //	ST7789_UnSelect();
 }
+
+
+
+
+
 void ST7789_DrawCircle(uint16_t x0, uint16_t y0, uint8_t r, uint16_t color)
 {
 	int16_t f = 1 - r;

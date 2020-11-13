@@ -17,9 +17,10 @@ typedef struct {
 } FontDef;
 
 
-BMP_EXT FontDef Font_16x26;
-BMP_EXT FontDef Font_7x10;
+ BMP_EXT FontDef Font_16x26;
+ BMP_EXT FontDef Font_7x10;
 
+ BMP_EXT const uint8_t gImage_disableble[1828];
 
  BMP_EXT const uint8_t gImage_bmp[115208];
  BMP_EXT const uint16_t Font16x26 [];

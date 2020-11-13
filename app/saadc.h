@@ -14,7 +14,7 @@
 #define SAADC_EXT extern
 #endif
 
-SAADC_EXT float SAADC_Value;
+SAADC_EXT uint16_t SAADC_Value;
 
 SAADC_EXT void SAADC_Init(void);
 
