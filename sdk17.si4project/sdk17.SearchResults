@@ -1,5 +1,15 @@
----- ABS Matches (5 in 0 files) ----
-ST7789_DrawLine in st7789.c (F:\repositories\ST7789-STM32\ST7789) :     uint16_t steep = ABS(y1 - y0) > ABS(x1 - x0);
-ST7789_DrawLine in st7789.c (F:\repositories\ST7789-STM32\ST7789) :     dy = ABS(y1 - y0);
-ST7789_DrawFilledTriangle in st7789.c (F:\repositories\ST7789-STM32\ST7789) : 	deltax = ABS(x2 - x1);
-ST7789_DrawFilledTriangle in st7789.c (F:\repositories\ST7789-STM32\ST7789) : 	deltay = ABS(y2 - y1);
+---- CONFIG_GPIO_AS_PINRESET Matches (14 in 7 files) ----
+SystemInit in system_nrf52.c (modules\nrfx\mdk) :     /* Configure GPIO pads as pPin Reset pin if Pin Reset capabilities desired. If CONFIG_GPIO_AS_PINRESET is not
+SystemInit in system_nrf52.c (modules\nrfx\mdk) :     #if defined (CONFIG_GPIO_AS_PINRESET)
+SystemInit in system_nrf52805.c (modules\nrfx\mdk) :     /* Configure GPIO pads as pPin Reset pin if Pin Reset capabilities desired. If CONFIG_GPIO_AS_PINRESET is not
+SystemInit in system_nrf52805.c (modules\nrfx\mdk) :     #if defined (CONFIG_GPIO_AS_PINRESET)
+SystemInit in system_nrf52810.c (modules\nrfx\mdk) :     /* Configure GPIO pads as pPin Reset pin if Pin Reset capabilities desired. If CONFIG_GPIO_AS_PINRESET is not
+SystemInit in system_nrf52810.c (modules\nrfx\mdk) :     #if defined (CONFIG_GPIO_AS_PINRESET)
+SystemInit in system_nrf52811.c (modules\nrfx\mdk) :     /* Configure GPIO pads as pPin Reset pin if Pin Reset capabilities desired. If CONFIG_GPIO_AS_PINRESET is not
+SystemInit in system_nrf52811.c (modules\nrfx\mdk) :     #if defined (CONFIG_GPIO_AS_PINRESET)
+SystemInit in system_nrf52820.c (modules\nrfx\mdk) :     /* Configure GPIO pads as pPin Reset pin if Pin Reset capabilities desired. If CONFIG_GPIO_AS_PINRESET is not
+SystemInit in system_nrf52820.c (modules\nrfx\mdk) :     #if defined (CONFIG_GPIO_AS_PINRESET)
+SystemInit in system_nrf52833.c (modules\nrfx\mdk) :     /* Configure GPIO pads as pPin Reset pin if Pin Reset capabilities desired. If CONFIG_GPIO_AS_PINRESET is not
+SystemInit in system_nrf52833.c (modules\nrfx\mdk) :     #if defined (CONFIG_GPIO_AS_PINRESET)
+SystemInit in system_nrf52840.c (modules\nrfx\mdk) :     /* Configure GPIO pads as pPin Reset pin if Pin Reset capabilities desired. If CONFIG_GPIO_AS_PINRESET is not
+SystemInit in system_nrf52840.c (modules\nrfx\mdk) :     #if defined (CONFIG_GPIO_AS_PINRESET)

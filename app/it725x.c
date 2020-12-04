@@ -143,16 +143,10 @@ static void TWI_Init(void)
 	config.frequency = NRF_DRV_TWI_FREQ_100K;
  config.interrupt_priority = APP_IRQ_PRIORITY_HIGH;
   config.clear_bus_init     = false;
-	err_code = nrf_drv_twi_init(&it725x,&config,NULL,NULL);
+	err_code = nrf_drv_twi_init(&it725x,&config,twi_handler,NULL);
   G_CHECK_ERROR_CODE_INFO(err_code);
 	nrf_drv_twi_enable(&it725x);
 #endif
-#ifdef HWTWI1
-	config.scl = TWI1_SCL_PIN;
-	config.sda = TWI1_SDA_PIN;
-	nrf_drv_twi_init(&it725x,&config,NULL,NULL);
-   nrf_drv_twi_enable(&it725x);
-#endif 
 }
 
 #endif

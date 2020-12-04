@@ -10,6 +10,9 @@
 #include "rtc.h"
 #include "ble_date.h"
 
+#define CH_PIN	
+#define TS_PIN 
+
 static uint8_t datebuff[10] = {0};
 static uint8_t timebuff[6] = {0};
 #define BATTERY_SAADC_OFFSET 0.04
@@ -119,6 +122,13 @@ void BatteryTimerBackCall(TimerHandle_t xTimer)
 		battery_level =(uint8_t)(420 - battery_Value)/30;
 		LCD_RefreshBattery(battery_level);
 		//
+
+#if 1
+	if(nrf_gpio_pin_read(TS_PIN))
+				nrf_gpio_pin_write(CH_PIN,1);
+	else
+		nrf_gpio_pin_write(CH_PIN,0);
+#endif
 
 }
 

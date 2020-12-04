@@ -10,7 +10,7 @@ nrfx_err_t nrfx_twi_tx(nrfx_twi_t const * p_instance, twi句柄
 
 #define TWI_GLOBAL
 #include "global.h"
-#include "nrf_drv_twi.h"
+
 #include "twi.h"
 #include "nrfx_timer.h"
 #include "nrf_delay.h"
@@ -20,18 +20,21 @@ nrfx_err_t nrfx_twi_tx(nrfx_twi_t const * p_instance, twi句柄
 //1、sdk_config.h 中使能twi的库函数
 //2、实例化twi handle
 //3、配置初始化
-#if 1
+#if 0
 #define TWI0_SDA_PIN 5
 #define TWI0_SCL_PIN 6
 #define INT_PIN 4
 
-#define HWTWI0
+//#define HWTWI0
+//#define HWTWI1
 #ifdef HWTWI0
 static const nrf_drv_twi_t twi0 = NRF_DRV_TWI_INSTANCE(0);
 #endif
 #ifdef HWTWI1
 static const nrf_drv_twi_t twi1 = NRF_DRV_TWI_INSTANCE(1)
 #endif
+#if defined (HWTWI0) || defined (HWTWI1)
+
 //bool twi_done = false;
 void twi_handler(nrf_drv_twi_evt_t const *p_evt,void *p_context)
 {
@@ -56,32 +59,41 @@ void twi_handler(nrf_drv_twi_evt_t const *p_evt,void *p_context)
 		}
 }
 
-#if defined (HWTWI0) || defined (HWTWI1)
+
 /************************************************
 说明:TWI 初始化
 函数名:ret_code_t TwiInit(void)
 参数:
 返回值:
 **************************************************/
-ret_code_t TWI_Init(void)
+ret_code_t TWI_Init(uint8_t TWI_NUM)
 {
 	nrf_drv_twi_config_t config = NRFX_TWI_DEFAULT_CONFIG;
         ret_code_t err_code;
 #ifdef HWTWI0
+	if(TWI_NUM == 0)
+		{
 	config.scl = TWI0_SCL_PIN;
 	config.sda = TWI0_SDA_PIN;
 	config.frequency = NRF_DRV_TWI_FREQ_100K;
-        config.interrupt_priority = APP_IRQ_PRIORITY_HIGH,
-        config.clear_bus_init     = false;
+  config.interrupt_priority = APP_IRQ_PRIORITY_HIGH;
+  config.clear_bus_init     = false;
 	err_code = nrf_drv_twi_init(&twi0,&config,NULL,NULL);
   G_CHECK_ERROR_CODE_INFO(err_code);
-	 nrf_drv_twi_enable(&twi0);
+	nrf_drv_twi_enable(&twi0);
+		}
 #endif
 #ifdef HWTWI1
+	if(TWI_NUM == 1)
+		{
 	config.scl = TWI1_SCL_PIN;
 	config.sda = TWI1_SDA_PIN;
+	config.frequency = NRF_DRV_TWI_FREQ_100K;
+	config.interrupt_priority = APP_IRQ_PRIORITY_HIGH;
+	config.clear_bus_init = false;
 	nrf_drv_twi_init(&twi1,&config,NULL,NULL);
-         nrf_drv_twi_enable(&twi1);
+  nrf_drv_twi_enable(&twi1);
+		}
 #endif 
 }
 ret_code_t TWI_Send(nrf_drv_twi_t const * p_instance,uint8_t address, uint8_t * p_data, size_t length)
@@ -109,7 +121,7 @@ ret_code_t TWI_Send(nrf_drv_twi_t const * p_instance,uint8_t address, uint8_t * 
 	3、W 发送8位数据/ 放弃SCL, R 接收8位数据
 
 */
-#if 1
+#if 0
 uint8_t pointDataBuff[255];
 uint8_t gesture_rxbuff[0x0E] = {0xA0};
 void test_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)

@@ -110,6 +110,7 @@ void LCD_RefreshMainPage(char *datebuff,char *timebuff )
 #endif
 void LCD_RefreshPage(char *datebuff,char *timebuff,uint8_t ui_page)
 {
+	uint8_t button;
 	switch(ui_page){
 		case MAIN_PAGE:
 			ST7789_WriteString(LCD_ICON_FONT_POS_X,LCD_ICON_FONT_POS_Y,mainPageFont,Font_16x26,GREEN,BLACK);
@@ -119,10 +120,15 @@ void LCD_RefreshPage(char *datebuff,char *timebuff,uint8_t ui_page)
 		
 		case BLE_PAGE:
 			ST7789_WriteString(LCD_ICON_FONT_POS_X,LCD_ICON_FONT_POS_Y,blePageFont,Font_16x26,GREEN,BLACK);
-			if(BDbutton) 
+			if(BDbutton){
+				button = 1;
 			ST7789_WriteString(LCD_TIME_POS_X,LCD_TIME_POS_Y,onFont,Font_16x26,GREEN,BLACK);
-			else
+				}
+			else{
+				button = 0;
 			ST7789_WriteString(LCD_TIME_POS_X,LCD_TIME_POS_Y,offFont,Font_16x26,GREEN,BLACK);
+				}
+			advertising_button(&button);
 			break;
 			
 			case HRS_PAGE:

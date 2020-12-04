@@ -676,6 +676,11 @@ void PostSleepProcessing(uint32_t ulExpectedIdleTime)
 
 }
 
+void TP4056PinInit(void)
+{
+	nrf_gpio_cfg(,NRF_GPIO_PIN_DIR_OUTPUT,NRF_GPIO_PIN_INPUT_DISCONNECT,NRF_GPIO_PIN_PULLDOWN,NRF_GPIO_PIN_S0S1,NRF_GPIO_PIN_NOSENSE);
+	nrf_gpio_cfg(,NRF_GPIO_PIN_DIR_INPUT,NRF_GPIO_PIN_INPUT_CONNECT,NRF_GPIO_PIN_PULLUP,NRF_GPIO_PIN_S0D1,NRF_GPIO_PIN_NOSENSE);
+}
 void MotorPinInit(void)
 {
 	nrf_gpio_cfg(16,NRF_GPIO_PIN_DIR_OUTPUT,NRF_GPIO_PIN_INPUT_DISCONNECT,NRF_GPIO_PIN_PULLDOWN,NRF_GPIO_PIN_S0S1,NRF_GPIO_PIN_NOSENSE);
@@ -718,55 +723,17 @@ void stack_overflow_cat(void *param)
 #endif
 RTC2_init(NULL);        //初始化，但不启动，有rtc任务启动
 
-// CommonWatchDogInit();	//watchdog init
-// TwiDriverInit(MPU6050);//hardware iic init
-// I2cSimulationInit();   //software iic init
-//	uart_init();					//hardware uart init
-//	MotorPinInit();				//motor init
-//nrf_gpio_cfg_output(SCREEN_LCD_LED_PIN);
-//nrf_gpio_pin_set(SCREEN_LCD_LED_PIN);
-
-//SPI_HardWareInit();				//spi hardware init
- //SPI_Init();
-//while(1)
-//{
-//SPI_WriteCommand(0xDA);
-//SPI_WriteData(0x88);
-//nrf_delay_ms(50);
-//}
-//SPI_WriteData(0x88);
-//ST7789_Init();
-//	LCD_Init();
-//	SPI_SoftWareInit();
-//nrf_delay_ms(2000);	
-//ST7789_Init();
-  //LCD_Init();
-//ST7789_Init();
-// ST7789_Fill_Color(WHITE);
-
-//ST7789_PictureDraw(gImage_bmp,sizeof(gImage_bmp));
-       SAADC_Init();    
+SAADC_Init();    
         
 LCD_Init();
 
 //IT725X_Init();
-ST7789_PictureDraw(120,120,gImage_disableble,sizeof(gImage_disableble));
-
-
-
-
+//ST7789_PictureDraw(120,120,gImage_disableble,sizeof(gImage_disableble));
 	MPU_Init();						//mpu6050 module init
 	 while( a = mpu_dmp_init())
 		{
         G_LOG_INFO("mpu_dmp_init error:%d",a);
 		}
-         
-     /*    while(1)
-         {
-         MPU_Read_data();
-         nrf_delay_ms(100);
-         }*/
-
 //	mpu6050 interrupt configure 有bug
 	MPU_INT_Init();
 //  MPU_Pin_int();

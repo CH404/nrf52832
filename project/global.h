@@ -50,6 +50,8 @@
 #include "ble_conn_params.h"
 #include "security_manager.h"
 
+#include "nrf_drv_twi.h"
+
 //#include "ble_dis.h"
 #include "advertising.h"
 
@@ -76,6 +78,7 @@
 #include "mpu6050.h"
 #include "lcd.h"
 #include "saadc.h"		//adc 
+#include "max.h"
 
 
 

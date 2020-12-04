@@ -26,7 +26,8 @@ typedef struct {
  BMP_EXT const uint16_t Font16x26 [];
  BMP_EXT const uint16_t Font7x10 [];
  //BMP_EXT const uint16_t Font16x16[];
- 
+ BMP_EXT uint8_t imageArray[];
+ BMP_EXT uint16_t position[70][2];
 
  
 BMP_EXT const char *mainPageFont;

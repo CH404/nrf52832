@@ -220,7 +220,6 @@
                 <debug>1</debug>
                 <option>
                     <name>CCDefines</name>
-                    <state>CONFIG_GPIO_AS_PINRESET</state>
                     <state>FLOAT_ABI_HARD</state>
                     <state>NRF52</state>
                     <state>NRF52832_XXAA</state>
@@ -2178,6 +2177,9 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\main.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\app\max.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\mpu6050\mpu6050.c</name>

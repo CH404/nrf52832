@@ -2408,6 +2408,9 @@
             <name>$PROJ_DIR$\..\main.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\app\max.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\mpu6050\mpu6050.c</name>
         </file>
         <file>
